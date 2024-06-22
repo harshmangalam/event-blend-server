@@ -21,6 +21,7 @@ model User {
   bio          String?
   profilePhoto String?
   locations    Location[]
+  isAdult      Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
