@@ -13,10 +13,16 @@ const locationSchema = z.tuple([
 ]);
 
 const signupSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(6),
   isAdult: z.boolean(),
   location: locationSchema,
 });
-export { signupSchema, geoLocationSchema };
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export { signupSchema, geoLocationSchema, loginSchema };
