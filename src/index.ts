@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import auth from "./routes/auth";
+import auth from "./features/auth/route";
 const app = new Hono();
 
 app.get("/", (c) => {
