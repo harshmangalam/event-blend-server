@@ -7,5 +7,11 @@ app.get("/", (c) => {
 });
 
 app.route("/api/auth", auth);
+app.onError((err: any, c) => {
+  return c.json({
+    success: false,
+    message: "Internal Server Error",
+  });
+});
 
 export default app;

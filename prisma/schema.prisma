@@ -22,8 +22,8 @@ model User {
 
 model Location {
   id        String   @id @default(cuid())
-  lat       Int
-  lng       Int
+  lat       Float
+  lon       Float
   city      String
   state     String?
   country   String?
