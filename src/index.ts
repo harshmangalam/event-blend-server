@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import auth from "./features/auth/route";
+import auth from "./feature/auth/route";
 import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
 const app = new Hono();
