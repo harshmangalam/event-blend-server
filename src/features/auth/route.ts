@@ -6,7 +6,7 @@ import { geoLocationSchema, loginSchema, signupSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 import { sign } from "hono/jwt";
 import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from "../../config/constants";
-import { setCookie } from "hono/cookie";
+import { setCookie, deleteCookie } from "hono/cookie";
 
 const app = new Hono();
 
@@ -112,7 +112,10 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
 });
 
 app.post("/logout", (c) => {
+  deleteCookie(c, "accessToken");
+  deleteCookie(c, "refreshToken");
   return c.json({
+    success: true,
     message: "Logout successfully",
   });
 });
