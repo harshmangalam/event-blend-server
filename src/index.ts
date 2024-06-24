@@ -2,12 +2,9 @@ import { Hono } from "hono";
 import auth from "./feature/auth/route";
 import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
+import { env } from "./config/env";
 
 const app = new Hono();
-
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
 
 app.route("/api/auth", auth);
 app.onError((err, c) => {
@@ -42,4 +39,7 @@ app.onError((err, c) => {
   return c.json({ success: false, message: "Internal server error" }, 500);
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  port: env.PORT,
+};

@@ -13,6 +13,7 @@ import {
 } from "../../config/constants";
 import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "../../middleware/auth";
+import { env } from "../../config/env";
 
 const app = new Hono();
 
@@ -48,7 +49,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       exp: getExpTimestamp(ACCESS_TOKEN_EXP),
       sub: user.id,
     },
-    Bun.env.JWT_ACEESS_TOKEN_SECRET!
+    env.JWT_ACEESS_TOKEN_SECRET
   );
 
   // create refresh token
@@ -57,7 +58,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       exp: getExpTimestamp(REFRESH_TOKEN_EXP),
       sub: user.id,
     },
-    Bun.env.JWT_REFRESH_TOKEN_SECRET!
+    env.JWT_REFRESH_TOKEN_SECRET
   );
   setCookie(c, ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
@@ -130,7 +131,7 @@ app.get(
   "/me",
   jwt({
     cookie: ACCESS_TOKEN_COOKIE_NAME,
-    secret: Bun.env.JWT_ACEESS_TOKEN_SECRET!,
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
   }),
   isAuthenticated,
   (c) => {
