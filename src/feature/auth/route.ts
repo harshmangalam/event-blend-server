@@ -4,9 +4,15 @@ import { prisma } from "../../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
 import { geoLocationSchema, loginSchema, signupSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
-import { sign } from "hono/jwt";
-import { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } from "../../config/constants";
+import { jwt, sign } from "hono/jwt";
+import {
+  ACCESS_TOKEN_COOKIE_NAME,
+  ACCESS_TOKEN_EXP,
+  REFRESH_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_EXP,
+} from "../../config/constants";
 import { setCookie, deleteCookie } from "hono/cookie";
+import { isAuthenticated } from "../../middleware/auth";
 
 const app = new Hono();
 
@@ -53,12 +59,12 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
     },
     Bun.env.JWT_REFRESH_TOKEN_SECRET!
   );
-  setCookie(c, "accessToken", accessToken, {
+  setCookie(c, ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
     path: "/",
     maxAge: ACCESS_TOKEN_EXP,
   });
-  setCookie(c, "refreshToken", refreshToken, {
+  setCookie(c, REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
     httpOnly: true,
     path: "/",
     maxAge: REFRESH_TOKEN_EXP,
@@ -112,18 +118,26 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
 });
 
 app.post("/logout", (c) => {
-  deleteCookie(c, "accessToken");
-  deleteCookie(c, "refreshToken");
+  deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
+  deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
   return c.json({
     success: true,
     message: "Logout successfully",
   });
 });
 
-app.get("/me", (c) => {
-  return c.json({
-    message: "Fetch current user",
-  });
-});
+app.get(
+  "/me",
+  jwt({
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+    secret: Bun.env.JWT_ACEESS_TOKEN_SECRET!,
+  }),
+  isAuthenticated,
+  (c) => {
+    return c.json({
+      message: "Fetch current user",
+    });
+  }
+);
 
 export default app;

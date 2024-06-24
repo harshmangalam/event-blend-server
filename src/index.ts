@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import auth from "./feature/auth/route";
 import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
-import { JwtTokenExpired, JwtTokenInvalid } from "hono/utils/jwt/types";
+
 const app = new Hono();
 
 app.get("/", (c) => {
@@ -12,6 +12,9 @@ app.get("/", (c) => {
 app.route("/api/auth", auth);
 app.onError((err, c) => {
   console.log(err);
+
+  // ---------- Handle Prisma error ---------------
+
   if ((err as any).code === "P2002") {
     const extractedText = extractDuplicatePrismaField(err.message);
     return c.json(
@@ -34,28 +37,6 @@ app.onError((err, c) => {
       err.status
     );
   }
-  // ------------ Handle JWT token error  ------------
-
-  if (err instanceof JwtTokenExpired) {
-    return c.json(
-      {
-        success: false,
-        message: "Access token has expired",
-      },
-      401
-    );
-  }
-
-  if (err instanceof JwtTokenInvalid) {
-    return c.json(
-      {
-        success: false,
-        message: "Access token is invalid",
-      },
-      400
-    );
-  }
-
   // ---------- Handle Rest of the Error ----------------
 
   return c.json({ success: false, message: "Internal server error" }, 500);
