@@ -6,6 +6,7 @@ import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { createTopicSchema } from "./schema";
+import { prisma } from "../../lib/prisma";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -19,10 +20,21 @@ app.post(
   isAuthenticated,
   isAdmin,
   async (c) => {
+    const body = c.req.valid("json");
+    const currentUser = c.get("user");
+    const topic = await prisma.topic.create({
+      data: {
+        name: body.name,
+        userId: currentUser.id,
+      },
+    });
     return c.json(
       {
         status: true,
-        message: "Group created successfully",
+        message: "Topic created successfully",
+        data: {
+          topic,
+        },
       },
       201
     );
