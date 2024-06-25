@@ -27,4 +27,18 @@ function extractDuplicatePrismaField(message: string) {
   }
   return null;
 }
-export { reverseGeocodingAPI, getExpTimestamp, extractDuplicatePrismaField };
+
+function paginate(page?: number, pageSize?: number) {
+  pageSize = pageSize || 10;
+  page = page || 1;
+
+  const skip = (page - 1) * pageSize;
+  const take = pageSize;
+  return [take, skip];
+}
+export {
+  reverseGeocodingAPI,
+  getExpTimestamp,
+  extractDuplicatePrismaField,
+  paginate,
+};

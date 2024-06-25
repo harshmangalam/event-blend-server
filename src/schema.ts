@@ -4,4 +4,9 @@ const locationSchema = z.tuple([
   z.number().min(-180).max(180), // Longitude: between -180 and 180
 ]);
 
-export { locationSchema };
+const paginationSchema = z.object({
+  pageSize: z.number().min(1).max(100).default(10),
+  page: z.number().default(1),
+});
+
+export { locationSchema, paginationSchema };

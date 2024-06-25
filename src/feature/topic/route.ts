@@ -7,6 +7,8 @@ import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { createTopicSchema } from "./schema";
 import { prisma } from "../../lib/prisma";
+import { paginationSchema } from "../../schema";
+import { paginate } from "../../lib/utils";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -40,4 +42,28 @@ app.post(
     );
   }
 );
+
+app.get("/", zValidator("query", paginationSchema), async (c) => {
+  const query = c.req.valid("query");
+  const [take, skip] = paginate(query.page, query.pageSize);
+  const topics = await prisma.topic.findMany({
+    take,
+    skip,
+  });
+  const totalTopics = await prisma.topic.count();
+
+  return c.json({
+    success: true,
+    message: "Fetch topics",
+    data: {
+      topics,
+      meta: {
+        total: totalTopics,
+        page: query.page,
+        pageSize: query.pageSize,
+        pagesCount: Math.ceil(totalTopics / query.pageSize),
+      },
+    },
+  });
+});
 export default app;
