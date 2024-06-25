@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RoleEnum {
+  User
+  Admin
+}
+
 model User {
   id           String     @id @default(cuid())
   name         String
@@ -16,6 +21,7 @@ model User {
   profilePhoto String?
   locations    Location[]
   isAdult      Boolean    @default(false)
+  role         RoleEnum   @default(User)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }

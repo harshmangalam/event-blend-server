@@ -14,8 +14,9 @@ import {
 import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "../../middleware/auth";
 import { env } from "../../config/env";
+import { Variables } from "../../types";
 
-const app = new Hono();
+const app = new Hono<{ Variables: Variables }>();
 
 app.post("/login", zValidator("json", loginSchema), async (c) => {
   const body = c.req.valid("json");
@@ -134,9 +135,24 @@ app.get(
     secret: env.JWT_ACEESS_TOKEN_SECRET,
   }),
   isAuthenticated,
-  (c) => {
+  async (c) => {
+    const currentUser = c.get("user");
+    const user = await prisma.user.findUnique({
+      where: {
+        id: currentUser.id,
+      },
+    });
+    if (!user) {
+      throw new HTTPException(404, {
+        message: "User not found",
+      });
+    }
     return c.json({
+      status: true,
       message: "Fetch current user",
+      data: {
+        user,
+      },
     });
   }
 );

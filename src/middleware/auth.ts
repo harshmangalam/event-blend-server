@@ -12,6 +12,7 @@ export const isAuthenticated = createMiddleware(async (c, next) => {
     select: {
       id: true,
       email: true,
+      role: true,
     },
   });
 
