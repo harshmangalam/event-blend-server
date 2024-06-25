@@ -157,4 +157,47 @@ app.get(
   }
 );
 
+app.get(
+  "/refresh",
+  jwt({ secret: env.JWT_REFRESH_TOKEN_SECRET, cookie: "refreshToken" }),
+  async (c) => {
+    const jwtPayload = c.get("jwtPayload");
+
+    // create access token
+    const accessToken = await sign(
+      {
+        exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+        sub: jwtPayload.sub,
+      },
+      env.JWT_ACEESS_TOKEN_SECRET
+    );
+
+    // create refresh token
+    const refreshToken = await sign(
+      {
+        exp: getExpTimestamp(REFRESH_TOKEN_EXP),
+        sub: jwtPayload.sub,
+      },
+      env.JWT_REFRESH_TOKEN_SECRET
+    );
+    setCookie(c, ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+      httpOnly: true,
+      path: "/",
+      maxAge: ACCESS_TOKEN_EXP,
+    });
+    setCookie(c, REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+      httpOnly: true,
+      path: "/",
+      maxAge: REFRESH_TOKEN_EXP,
+    });
+    return c.json({
+      success: true,
+      message: "Access & refresh token created",
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  }
+);
 export default app;
