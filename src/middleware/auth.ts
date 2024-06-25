@@ -1,8 +1,9 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "../lib/prisma";
+import { RoleEnum } from "@prisma/client";
 
-export const isAuthenticated = createMiddleware(async (c, next) => {
+const isAuthenticated = createMiddleware(async (c, next) => {
   const jwtPayload = c.get("jwtPayload");
 
   const user = await prisma.user.findUnique({
@@ -25,3 +26,15 @@ export const isAuthenticated = createMiddleware(async (c, next) => {
   c.set("user", user);
   await next();
 });
+
+const isAdmin = createMiddleware(async (c, next) => {
+  const currentUser = c.get("user");
+  if (currentUser.role !== RoleEnum.Admin) {
+    throw new HTTPException(403, {
+      message: "Access denied",
+    });
+  }
+  await next();
+});
+
+export { isAuthenticated, isAdmin };

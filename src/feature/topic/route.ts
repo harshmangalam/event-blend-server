@@ -3,7 +3,7 @@ import { Variables } from "../../types";
 import { jwt } from "hono/jwt";
 import { env } from "../../config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
-import { isAuthenticated } from "../../middleware/auth";
+import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { createTopicSchema } from "./schema";
 
@@ -17,6 +17,7 @@ app.post(
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
+  isAdmin,
   async (c) => {
     return c.json(
       {

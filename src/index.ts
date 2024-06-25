@@ -1,13 +1,16 @@
 import { Hono } from "hono";
-import auth from "./feature/auth/route";
 import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
 import { env } from "./config/env";
 import { Variables } from "./types";
 
+import auth from "./feature/auth/route";
+import topics from "./feature/topic/route";
+
 const app = new Hono<{ Variables: Variables }>();
 
 app.route("/api/auth", auth);
+app.route("/api/topics", topics);
 app.onError((err, c) => {
   console.log(err);
 
