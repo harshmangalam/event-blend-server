@@ -50,7 +50,8 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     take,
     skip,
   });
-  const totalTopics = await prisma.topic.count();
+  const totalCount = await prisma.topic.count();
+  const totalPages = Math.ceil(totalCount / query.pageSize);
 
   return c.json({
     success: true,
@@ -58,10 +59,10 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     data: {
       topics,
       meta: {
-        total: totalTopics,
+        totalCount,
+        totalPages,
         page: query.page,
         pageSize: query.pageSize,
-        pagesCount: Math.ceil(totalTopics / query.pageSize),
       },
     },
   });
