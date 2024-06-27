@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { createTopicSchema, deleteTopicSchema } from "./schema";
+import { topicBodySchema, topicParamSchema } from "./schema";
 import { prisma } from "../../lib/prisma";
 import { paginationSchema } from "../../schema";
 import { paginate } from "../../lib/utils";
@@ -14,7 +14,7 @@ const app = new Hono<{ Variables: Variables }>();
 
 app.post(
   "/",
-  zValidator("json", createTopicSchema),
+  zValidator("json", topicBodySchema),
   jwt({
     secret: env.JWT_ACEESS_TOKEN_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
@@ -67,19 +67,58 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     },
   });
 });
-app.delete("/:topicId", zValidator("param", deleteTopicSchema), async (c) => {
-  const param = c.req.param();
-  await prisma.topic.delete({
-    where: {
-      id: param.topicId,
-    },
-  });
-  return c.json(
-    {
+app.delete(
+  "/:topicId",
+  zValidator("param", topicParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+    await prisma.topic.delete({
+      where: {
+        id: param.topicId,
+      },
+    });
+    return c.json(
+      {
+        success: true,
+        message: "Topic deleted successfully",
+      },
+      201
+    );
+  }
+);
+
+app.patch(
+  "/:topicId",
+  zValidator("param", topicParamSchema),
+  zValidator("json", topicBodySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+    const body = c.req.valid("json");
+
+    await prisma.topic.update({
+      where: {
+        id: param.topicId,
+      },
+      data: {
+        ...body,
+      },
+    });
+    return c.json({
       success: true,
-      message: "Topic deleted successfully",
-    },
-    201
-  );
-});
+      message: "Topic updated successfully",
+    });
+  }
+);
 export default app;

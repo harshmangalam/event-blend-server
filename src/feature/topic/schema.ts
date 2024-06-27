@@ -1,10 +1,11 @@
 import { z } from "zod";
 
-const createTopicSchema = z.object({
+const topicBodySchema = z.object({
   name: z.string().min(1),
 });
 
-const deleteTopicSchema = z.object({
+const topicParamSchema = z.object({
   topicId: z.string(),
 });
-export { createTopicSchema, deleteTopicSchema };
+
+export { topicBodySchema, topicParamSchema };

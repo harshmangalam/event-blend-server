@@ -16,6 +16,7 @@ app.onError((err, c) => {
 
   // ---------- Handle Prisma error ---------------
 
+  // handle duplicate record  error
   if ((err as any).code === "P2002") {
     const extractedText = extractDuplicatePrismaField(err.message);
     return c.json(
@@ -27,11 +28,9 @@ app.onError((err, c) => {
     );
   }
 
+  // record does not exist
   if ((err as any).code === "P2025") {
-    return c.json(
-      { success: false, message: "Record to delete does not exist" },
-      410
-    );
+    return c.json({ success: false, message: "Record does not exist" }, 410);
   }
 
   // ----------- Handle HTTP Error --------------
