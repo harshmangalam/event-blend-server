@@ -27,6 +27,13 @@ app.onError((err, c) => {
     );
   }
 
+  if ((err as any).code === "P2025") {
+    return c.json(
+      { success: false, message: "Record to delete does not exist" },
+      410
+    );
+  }
+
   // ----------- Handle HTTP Error --------------
 
   if (err instanceof HTTPException) {
