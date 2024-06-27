@@ -5,8 +5,8 @@ const locationSchema = z.tuple([
 ]);
 
 const paginationSchema = z.object({
-  pageSize: z.number().min(1).max(100).default(10),
-  page: z.number().default(1),
+  pageSize: z.coerce.number().min(1).max(100).default(10),
+  page: z.coerce.number().default(1),
 });
 
 export { locationSchema, paginationSchema };

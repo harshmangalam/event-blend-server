@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { createTopicSchema } from "./schema";
+import { createTopicSchema, deleteTopicSchema } from "./schema";
 import { prisma } from "../../lib/prisma";
 import { paginationSchema } from "../../schema";
 import { paginate } from "../../lib/utils";
@@ -66,5 +66,20 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
       },
     },
   });
+});
+app.delete("/:topicId", zValidator("param", deleteTopicSchema), async (c) => {
+  const param = c.req.param();
+  await prisma.topic.delete({
+    where: {
+      id: param.topicId,
+    },
+  });
+  return c.json(
+    {
+      success: true,
+      message: "Topic deleted successfully",
+    },
+    201
+  );
 });
 export default app;
