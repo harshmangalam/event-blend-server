@@ -8,7 +8,7 @@ import { zValidator } from "@hono/zod-validator";
 import { paginationSchema } from "../../schema";
 import { paginate } from "../../lib/utils";
 import { prisma } from "../../lib/prisma";
-import { networkParamSchema } from "./schema";
+import { networkBodySchema, networkParamSchema } from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -68,6 +68,36 @@ app.get(
       message: "Fetch network by id",
       data: { network },
     });
+  }
+);
+
+app.post(
+  "/",
+  zValidator("json", networkBodySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const body = c.req.valid("json");
+    const network = await prisma.network.create({
+      data: {
+        ...body,
+      },
+    });
+
+    return c.json(
+      {
+        success: true,
+        message: "Network created successfully",
+        data: {
+          network,
+        },
+      },
+      201
+    );
   }
 );
 export default app;
