@@ -88,27 +88,24 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
     algorithm: "bcrypt",
     cost: 10,
   });
+
+  // fetch user location from lat & lon
+  let location;
+  if (body.location && body.location.length === 2) {
+    const [lat, lon] = body.location;
+    const locationResp = await reverseGeocodingAPI(lat, lon);
+    location = geoLocationSchema.parse(locationResp);
+  }
+
   const user = await prisma.user.create({
     data: {
       email: body.email,
       name: body.name,
       isAdult: body.isAdult,
       password,
+      location,
     },
   });
-
-  // fetch user location from lat & lon
-  if (body.location && body.location.length === 2) {
-    const [lat, lon] = body.location;
-    const locationResp = await reverseGeocodingAPI(lat, lon);
-    const location = geoLocationSchema.parse(locationResp);
-    await prisma.location.create({
-      data: {
-        userId: user.id,
-        ...location,
-      },
-    });
-  }
 
   return c.json({
     success: true,
