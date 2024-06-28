@@ -126,10 +126,30 @@ app.patch(
     return c.json(
       {
         success: true,
-        message: "Network created successfully",
+        message: "Network updated successfully",
         data: {
           network,
         },
+      },
+      201
+    );
+  }
+);
+app.delete(
+  "/:networkId",
+  zValidator("param", networkParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+
+    await prisma.network.delete({
+      where: {
+        id: param.networkId,
+      },
+    });
+    return c.json(
+      {
+        success: true,
+        message: "Network deleted successfully",
       },
       201
     );
