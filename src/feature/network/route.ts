@@ -100,4 +100,39 @@ app.post(
     );
   }
 );
+
+app.patch(
+  "/:networkId",
+  zValidator("param", networkParamSchema),
+  zValidator("json", networkBodySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const body = c.req.valid("json");
+    const param = c.req.valid("param");
+    const network = await prisma.network.update({
+      where: {
+        id: param.networkId,
+      },
+      data: {
+        ...body,
+      },
+    });
+
+    return c.json(
+      {
+        success: true,
+        message: "Network created successfully",
+        data: {
+          network,
+        },
+      },
+      201
+    );
+  }
+);
 export default app;
