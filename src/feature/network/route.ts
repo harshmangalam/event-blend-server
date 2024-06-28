@@ -8,6 +8,7 @@ import { zValidator } from "@hono/zod-validator";
 import { paginationSchema } from "../../schema";
 import { paginate } from "../../lib/utils";
 import { prisma } from "../../lib/prisma";
+import { networkParamSchema } from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -41,6 +42,31 @@ app.get(
         page: query.page,
         pageSize: query.pageSize,
       },
+    });
+  }
+);
+
+app.get(
+  "/:networkId",
+  zValidator("param", networkParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const query = c.req.valid("param");
+    const network = await prisma.network.findUnique({
+      where: {
+        id: query.networkId,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch network by id",
+      data: { network },
     });
   }
 );
