@@ -9,6 +9,7 @@ import { topicBodySchema, topicParamSchema } from "./schema";
 import { prisma } from "../../lib/prisma";
 import { paginationSchema } from "../../schema";
 import { paginate } from "../../lib/utils";
+import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -67,6 +68,25 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     },
   });
 });
+
+app.get("/:topicId", zValidator("param", topicParamSchema), async (c) => {
+  const param = c.req.valid("param");
+  const topic = await prisma.topic.findUnique({
+    where: {
+      id: param.topicId,
+    },
+  });
+  if (!topic) {
+    throw new HTTPException(404, { message: "Topic not found" });
+  }
+  return c.json({
+    success: true,
+    message: "Fetch topic by id",
+    data: {
+      topic,
+    },
+  });
+});
 app.delete(
   "/:topicId",
   zValidator("param", topicParamSchema),
@@ -115,10 +135,13 @@ app.patch(
         ...body,
       },
     });
-    return c.json({
-      success: true,
-      message: "Topic updated successfully",
-    });
+    return c.json(
+      {
+        success: true,
+        message: "Topic updated successfully",
+      },
+      201
+    );
   }
 );
 export default app;
