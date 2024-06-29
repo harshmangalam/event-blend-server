@@ -9,4 +9,12 @@ const paginationSchema = z.object({
   page: z.coerce.number().default(1),
 });
 
-export { locationSchema, paginationSchema };
+const geoLocationSchema = z.object({
+  lat: z.number(),
+  lon: z.number(),
+  city: z.string(),
+  state: z.string(),
+  country: z.string(),
+});
+
+export { locationSchema, paginationSchema, geoLocationSchema };
