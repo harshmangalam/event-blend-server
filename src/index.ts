@@ -6,11 +6,16 @@ import { Variables } from "./types";
 
 import auth from "./feature/auth/route";
 import topics from "./feature/topic/route";
+import networks from "./feature/network/route";
+import groups from "./feature/group/route";
 
 const app = new Hono<{ Variables: Variables }>();
 
 app.route("/api/auth", auth);
 app.route("/api/topics", topics);
+app.route("/api/networks", networks);
+app.route("/api/groups", groups);
+
 app.onError((err, c) => {
   console.log(err);
 
@@ -22,7 +27,7 @@ app.onError((err, c) => {
     return c.json(
       {
         success: false,
-        message: `This ${extractedText} is already in use. Please use a different ${extractedText}.`,
+        message: `${extractedText} is already in use. Please use a different ${extractedText}.`,
       },
       400
     );
