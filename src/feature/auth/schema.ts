@@ -1,13 +1,5 @@
 import { z } from "zod";
-import { locationSchema } from "../../schema";
-
-const geoLocationSchema = z.object({
-  lat: z.number(),
-  lon: z.number(),
-  city: z.string(),
-  state: z.string(),
-  country: z.string(),
-});
+import { locationSchema, geoLocationSchema } from "../../schema";
 
 const signupSchema = z.object({
   name: z.string().min(1),
