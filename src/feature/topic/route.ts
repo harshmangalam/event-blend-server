@@ -27,7 +27,7 @@ app.post(
     const currentUser = c.get("user");
     const topic = await prisma.topic.create({
       data: {
-        name: body.name,
+        ...body,
         userId: currentUser.id,
       },
     });

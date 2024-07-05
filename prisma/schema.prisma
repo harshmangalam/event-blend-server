@@ -33,6 +33,7 @@ model Topic {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   group     Group[]
+  isActive  Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
