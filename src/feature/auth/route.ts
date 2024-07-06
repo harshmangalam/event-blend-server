@@ -145,7 +145,7 @@ app.get(
       });
     }
     return c.json({
-      status: true,
+      success: true,
       message: "Fetch current user",
       data: {
         user,

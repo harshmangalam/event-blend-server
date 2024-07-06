@@ -33,7 +33,7 @@ app.post(
     });
     return c.json(
       {
-        status: true,
+        success: true,
         message: "Topic created successfully",
         data: {
           topic,

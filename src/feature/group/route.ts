@@ -41,7 +41,7 @@ app.post(
 
     return c.json(
       {
-        status: true,
+        success: true,
         message: "Group created successfully",
         data: {
           group,
