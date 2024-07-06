@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
 import { env } from "./config/env";
 import { Variables } from "./types";
+import { cors } from "hono/cors";
 
 import auth from "./feature/auth/route";
 import topics from "./feature/topic/route";
@@ -11,6 +12,12 @@ import groups from "./feature/group/route";
 
 const app = new Hono<{ Variables: Variables }>();
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.route("/api/auth", auth);
 app.route("/api/topics", topics);
 app.route("/api/networks", networks);
