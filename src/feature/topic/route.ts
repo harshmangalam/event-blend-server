@@ -48,6 +48,9 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
   const query = c.req.valid("query");
   const [take, skip] = paginate(query.page, query.pageSize);
   const topics = await prisma.topic.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       user: {
         select: {
