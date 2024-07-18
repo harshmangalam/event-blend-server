@@ -1,4 +1,4 @@
-const ACCESS_TOKEN_EXP = 60 * 60; // 60 minutes
+const ACCESS_TOKEN_EXP = 24 * 60 * 60; //  1 day
 const REFRESH_TOKEN_EXP = 30 * 86400; // 30 days
 const ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";

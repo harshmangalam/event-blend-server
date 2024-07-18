@@ -30,6 +30,13 @@ app.get(
     const networks = await prisma.network.findMany({
       take,
       skip,
+      include: {
+        _count: {
+          select: {
+            groups: true,
+          },
+        },
+      },
     });
 
     return c.json({
