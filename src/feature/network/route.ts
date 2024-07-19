@@ -36,6 +36,13 @@ app.get(
             groups: true,
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profilePhoto: true,
+          },
+        },
       },
     });
 
@@ -89,9 +96,11 @@ app.post(
   isAdmin,
   async (c) => {
     const body = c.req.valid("json");
+    const currentUser = c.get("user");
     const network = await prisma.network.create({
       data: {
         ...body,
+        userId: currentUser.id,
       },
     });
 
