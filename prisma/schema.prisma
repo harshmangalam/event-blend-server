@@ -33,8 +33,8 @@ model User {
   members       GroupMember[]
   groupsAdmin   Group[]
   createdTopics Topic[]
-  createdAt     DateTime      @default(now())
   network       Network?
+  createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
 
@@ -58,10 +58,10 @@ model Group {
   members     GroupMember[]
   admin       User          @relation(fields: [adminId], references: [id])
   adminId     String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
   network     Network?      @relation(fields: [networkId], references: [id])
   networkId   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model GroupMember {
