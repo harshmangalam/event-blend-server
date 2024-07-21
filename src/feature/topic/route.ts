@@ -160,4 +160,24 @@ app.patch(
     );
   }
 );
+
+app.get("/topic-options", async (c) => {
+  const topics = await prisma.topic.findMany({
+    where: {
+      isActive: true,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Fetch topics for dropdown options",
+    data: {
+      topics,
+    },
+  });
+});
 export default app;

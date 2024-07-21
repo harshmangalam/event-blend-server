@@ -26,6 +26,7 @@ app.post(
     const locationResp = await reverseGeocodingAPI(lat, lon);
     const location = geoLocationSchema.parse(locationResp);
     const currentUser = c.get("user");
+
     const group = await prisma.group.create({
       data: {
         name: body.name,
