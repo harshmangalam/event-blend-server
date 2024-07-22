@@ -8,4 +8,9 @@ const createGroupSchema = z.object({
   description: z.string(),
   networkId: z.string().optional(),
 });
-export { createGroupSchema };
+
+const groupParamSchema = z.object({
+  groupId: z.string(),
+});
+
+export { createGroupSchema, groupParamSchema };

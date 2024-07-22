@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { createGroupSchema } from "./schema";
+import { createGroupSchema, groupParamSchema } from "./schema";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
 import { prisma } from "../../lib/prisma";
 import { geoLocationSchema, paginationSchema } from "../../schema";
@@ -91,6 +91,12 @@ app.get(
             isActive: true,
           },
         },
+        network: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -107,5 +113,22 @@ app.get(
     });
   }
 );
+
+app.delete("/:groupId", zValidator("param", groupParamSchema), async (c) => {
+  const param = c.req.valid("param");
+
+  await prisma.group.delete({
+    where: {
+      id: param.groupId,
+    },
+  });
+  return c.json(
+    {
+      success: true,
+      message: "Group deleted successfully",
+    },
+    201
+  );
+});
 
 export default app;
