@@ -101,7 +101,6 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
     data: {
       email: body.email,
       name: body.name,
-      isAdult: body.isAdult,
       password,
       location,
     },

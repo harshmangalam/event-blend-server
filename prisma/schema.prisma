@@ -28,7 +28,6 @@ model User {
   bio           String?
   profilePhoto  String?
   location      Json?
-  isAdult       Boolean       @default(false)
   role          RoleEnum      @default(User)
   members       GroupMember[]
   groupsAdmin   Group[]
