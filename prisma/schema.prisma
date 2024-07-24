@@ -26,8 +26,8 @@ model Location {
   country   String?
   state     String?
   timezone  String
-  lat       Decimal
-  lon       Decimal
+  lat       Decimal  @db.Decimal(17, 15)
+  lon       Decimal  @db.Decimal(17, 15)
   groups    Group[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -7,7 +7,7 @@ import { isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { createGroupSchema, groupParamSchema } from "./schema";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
-import { prisma } from "../../lib/prisma";
+import { prisma, Prisma } from "../../lib/prisma";
 import { geoLocationSchema, paginationSchema } from "../../schema";
 import { HTTPException } from "hono/http-exception";
 
@@ -23,24 +23,29 @@ app.post(
   isAuthenticated,
   async (c) => {
     const body = c.req.valid("json");
+    const locationResp = await reverseGeocodingAPI(
+      body.location[0],
+      body.location[1]
+    );
+    const { timezone, lat, lon, ...rest } =
+      geoLocationSchema.parse(locationResp);
 
-    const [lat, lon] = body.location;
     const location = await prisma.location.findFirst({
       where: {
-        lat,
-        lon,
+        lat: lat,
+        lon: lon,
       },
     });
 
     let locationId = location?.id;
 
     if (!location) {
-      const locationResp = await reverseGeocodingAPI(lat, lon);
-      const locationData = geoLocationSchema.parse(locationResp);
       const newLocation = await prisma.location.create({
         data: {
-          ...locationData,
-          timezone: locationData.timezone.name,
+          ...rest,
+          lat,
+          lon,
+          timezone: timezone.name,
         },
       });
 
