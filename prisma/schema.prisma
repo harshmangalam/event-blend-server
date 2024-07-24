@@ -20,6 +20,19 @@ enum GroupMemberRole {
   AssistantOrganizer
 }
 
+model Location {
+  id        String   @id @default(cuid())
+  city      String   @unique
+  country   String?
+  state     String?
+  timezone  String
+  lat       Decimal
+  lon       Decimal
+  groups    Group[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String
@@ -50,7 +63,9 @@ model Topic {
 
 model Group {
   id          String        @id @default(cuid())
-  location    Json
+  location    Location      @relation(references: [id], fields: [locationId])
+  locationId  String
+  city        String?
   topics      Topic[]
   name        String        @unique
   description String

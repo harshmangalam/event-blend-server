@@ -9,6 +9,7 @@ import { createGroupSchema, groupParamSchema } from "./schema";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
 import { prisma } from "../../lib/prisma";
 import { geoLocationSchema, paginationSchema } from "../../schema";
+import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -22,16 +23,43 @@ app.post(
   isAuthenticated,
   async (c) => {
     const body = c.req.valid("json");
+
     const [lat, lon] = body.location;
-    const locationResp = await reverseGeocodingAPI(lat, lon);
-    const location = geoLocationSchema.parse(locationResp);
+    const location = await prisma.location.findFirst({
+      where: {
+        lat,
+        lon,
+      },
+    });
+
+    let locationId = location?.id;
+
+    if (!location) {
+      const locationResp = await reverseGeocodingAPI(lat, lon);
+      const locationData = geoLocationSchema.parse(locationResp);
+      const newLocation = await prisma.location.create({
+        data: {
+          ...locationData,
+          timezone: locationData.timezone.name,
+        },
+      });
+
+      locationId = newLocation.id;
+    }
+
+    if (!locationId) {
+      throw new HTTPException(400, {
+        message: "Location not found",
+      });
+    }
+
     const currentUser = c.get("user");
 
     const group = await prisma.group.create({
       data: {
         name: body.name,
         description: body.description,
-        location,
+        locationId,
         topics: {
           connect: body.topics.map((topicId) => ({
             id: topicId,
@@ -95,6 +123,13 @@ app.get(
           select: {
             id: true,
             name: true,
+          },
+        },
+        location: {
+          select: {
+            city: true,
+            state: true,
+            country: true,
           },
         },
       },

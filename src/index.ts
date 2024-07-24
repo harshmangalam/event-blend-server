@@ -9,6 +9,7 @@ import auth from "./feature/auth/route";
 import topics from "./feature/topic/route";
 import networks from "./feature/network/route";
 import groups from "./feature/group/route";
+import locations from "./feature/location/route";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -22,6 +23,7 @@ app.route("/api/auth", auth);
 app.route("/api/topics", topics);
 app.route("/api/networks", networks);
 app.route("/api/groups", groups);
+app.route("/api/locations", locations);
 
 app.onError((err, c) => {
   console.log(err);

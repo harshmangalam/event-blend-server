@@ -15,6 +15,9 @@ const geoLocationSchema = z.object({
   city: z.string(),
   state: z.string(),
   country: z.string(),
+  timezone: z.object({
+    name: z.string(),
+  }),
 });
 
 export { locationSchema, paginationSchema, geoLocationSchema };
