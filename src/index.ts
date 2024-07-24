@@ -34,7 +34,7 @@ app.onError((err, c) => {
     return c.json(
       {
         success: false,
-        message: `${extractedText} is already in use. Please use a different ${extractedText}.`,
+        message: `${extractedText} is already in use, please use a different ${extractedText}.`,
       },
       400
     );
