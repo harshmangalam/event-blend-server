@@ -38,4 +38,30 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
   });
 });
 
+app.get("/popular-cities", async (c) => {
+  const locations = await prisma.location.findMany({
+    select: {
+      id: true,
+      city: true,
+      _count: {
+        select: {
+          groups: true,
+        },
+      },
+    },
+    orderBy: {
+      groups: {
+        _count: "desc",
+      },
+    },
+  });
+  return c.json({
+    success: true,
+    message: "Fetch popular cities",
+    data: {
+      locations,
+    },
+  });
+});
+
 export default app;
