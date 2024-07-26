@@ -171,4 +171,47 @@ app.delete("/:groupId", zValidator("param", groupParamSchema), async (c) => {
   );
 });
 
+app.get("/popular-groups", async (c) => {
+  const groups = await prisma.group.findMany({
+    take: 4,
+    include: {
+      _count: {
+        select: {
+          members: true,
+        },
+      },
+      admin: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      topics: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      location: {
+        select: {
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
+    },
+    orderBy: {
+      members: {
+        _count: "desc",
+      },
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Fetch popular groups",
+    data: { groups },
+  });
+});
+
 export default app;
