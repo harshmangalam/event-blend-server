@@ -214,4 +214,46 @@ app.get("/popular-groups", async (c) => {
   });
 });
 
+app.get("/discover-groups", async (c) => {
+  const groups = await prisma.group.findMany({
+    include: {
+      _count: {
+        select: {
+          members: true,
+        },
+      },
+      admin: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      topics: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      location: {
+        select: {
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
+    },
+    orderBy: {
+      members: {
+        _count: "desc",
+      },
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Discover groups",
+    data: { groups },
+  });
+});
+
 export default app;
