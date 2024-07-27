@@ -28,7 +28,9 @@ model Location {
   timezone  String
   lat       Decimal
   lon       Decimal
+  address   String?
   groups    Group[]
+  events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -45,6 +47,7 @@ model User {
   members       GroupMember[]
   groupsAdmin   Group[]
   createdTopics Topic[]
+  events        Event[]
   network       Network?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -74,6 +77,7 @@ model Group {
   network     Network?      @relation(fields: [networkId], references: [id])
   networkId   String?
   poster      String?
+  events      Event[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
@@ -99,4 +103,30 @@ model Network {
   groups          Group[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Event {
+  id         String      @id @default(cuid())
+  name       String
+  group      Group       @relation(references: [id], fields: [groupId])
+  groupId    String
+  poster     String?
+  location   Location    @relation(references: [id], fields: [locationId])
+  locationId String
+  details    String?
+  dates      EventDate[]
+  attendees  User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventDate {
+  id        String   @id @default(cuid())
+  startDate DateTime
+  endDate   DateTime
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@index([eventId])
 }
