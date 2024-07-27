@@ -40,6 +40,7 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
 
 app.get("/popular-cities", async (c) => {
   const locations = await prisma.location.findMany({
+    take: 5,
     select: {
       id: true,
       city: true,
@@ -60,6 +61,46 @@ app.get("/popular-cities", async (c) => {
     message: "Fetch popular cities",
     data: {
       locations,
+    },
+  });
+});
+
+app.get("/discover-cities", async (c) => {
+  const locations = await prisma.location.findMany({
+    select: {
+      id: true,
+      city: true,
+      country: true,
+      _count: {
+        select: {
+          groups: true,
+        },
+      },
+    },
+    orderBy: {
+      groups: {
+        _count: "desc",
+      },
+    },
+  });
+
+  const results = locations.reduce<{
+    [country: string]: string[];
+  }>((acc, location) => {
+    const { country, city } = location;
+    if (country) {
+      if (!acc[country]) {
+        acc[country] = [];
+      }
+      acc[country].push(city);
+    }
+    return acc;
+  }, {});
+  return c.json({
+    success: true,
+    message: "Fetch popular cities",
+    data: {
+      locations: results,
     },
   });
 });

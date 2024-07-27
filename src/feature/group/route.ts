@@ -32,8 +32,8 @@ app.post(
 
     const location = await prisma.location.findFirst({
       where: {
-        lat: lat,
-        lon: lon,
+        lat: new Prisma.Decimal(lat),
+        lon: new Prisma.Decimal(lon),
       },
     });
 
@@ -43,8 +43,8 @@ app.post(
       const newLocation = await prisma.location.create({
         data: {
           ...rest,
-          lat,
-          lon,
+          lat: new Prisma.Decimal(lat),
+          lon: new Prisma.Decimal(lon),
           timezone: timezone.name,
         },
       });
