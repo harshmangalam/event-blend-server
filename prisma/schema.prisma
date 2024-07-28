@@ -20,6 +20,11 @@ enum GroupMemberRole {
   AssistantOrganizer
 }
 
+enum EventTypeEnum {
+  Online
+  InPerson
+}
+
 model Location {
   id        String   @id @default(cuid())
   city      String   @unique
@@ -53,30 +58,36 @@ model User {
 }
 
 model Topic {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  group     Group[]
-  isActive  Boolean? @default(false)
+  id         String   @id @default(cuid())
+  name       String   @unique
+  slug       String
+  group      Group[]
+  events     Event[]
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Group {
   id          String        @id @default(cuid())
-  location    Location      @relation(references: [id], fields: [locationId])
-  locationId  String
-  topics      Topic[]
   name        String        @unique
   description String
+  poster      String?
+  topics      Topic[]
+  events      Event[]
   members     GroupMember[]
+  location    Location      @relation(references: [id], fields: [locationId])
+  locationId  String
+  category    Category      @relation(references: [id], fields: [categoryId])
+  categoryId  String
   admin       User          @relation(fields: [adminId], references: [id])
   adminId     String
   network     Network?      @relation(fields: [networkId], references: [id])
   networkId   String?
-  poster      String?
-  events      Event[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
@@ -104,18 +115,33 @@ model Network {
   updatedAt       DateTime @updatedAt
 }
 
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events    Event[]
+  groups    Group[]
+  topics    Topic[]
+}
+
 model Event {
-  id         String      @id @default(cuid())
+  id         String        @id @default(cuid())
   name       String
-  group      Group       @relation(references: [id], fields: [groupId])
+  group      Group         @relation(references: [id], fields: [groupId])
   groupId    String
   poster     String?
-  location   Location    @relation(references: [id], fields: [locationId])
+  location   Location      @relation(references: [id], fields: [locationId])
   locationId String
   details    String?
   dates      EventDate[]
   attendees  User[]
   address    String
+  eventType  EventTypeEnum @default(InPerson)
+  category   Category      @relation(fields: [categoryId], references: [id])
+  categoryId String
+  topics     Topic[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
