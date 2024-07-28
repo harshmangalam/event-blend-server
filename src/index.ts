@@ -10,6 +10,7 @@ import topics from "./feature/topic/route";
 import networks from "./feature/network/route";
 import groups from "./feature/group/route";
 import locations from "./feature/location/route";
+import events from "./feature/event/route";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -24,6 +25,7 @@ app.route("/api/topics", topics);
 app.route("/api/networks", networks);
 app.route("/api/groups", groups);
 app.route("/api/locations", locations);
+app.route("/api/events", events);
 
 app.onError((err, c) => {
   console.log(err);
@@ -50,6 +52,7 @@ app.onError((err, c) => {
   // ----------- Handle HTTP Error --------------
 
   if (err instanceof HTTPException) {
+    console.log(err);
     return c.json(
       {
         success: false,

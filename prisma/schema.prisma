@@ -28,7 +28,6 @@ model Location {
   timezone  String
   lat       Decimal
   lon       Decimal
-  address   String?
   groups    Group[]
   events    Event[]
   createdAt DateTime @default(now())
@@ -116,6 +115,7 @@ model Event {
   details    String?
   dates      EventDate[]
   attendees  User[]
+  address    String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
