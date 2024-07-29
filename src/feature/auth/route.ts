@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import { getExpTimestamp, reverseGeocodingAPI } from "../../lib/utils";
+import { getExpTimestamp } from "@/lib/utils";
 import { prisma } from "../../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
-import { geoLocationSchema, loginSchema, signupSchema } from "./schema";
+import { loginSchema, signupSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 import { jwt, sign } from "hono/jwt";
 import {
@@ -10,12 +10,11 @@ import {
   ACCESS_TOKEN_EXP,
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_EXP,
-} from "../../config/constants";
+} from "@/config/constants";
 import { setCookie, deleteCookie } from "hono/cookie";
-import { isAuthenticated } from "../../middleware/auth";
-import { env } from "../../config/env";
-import { Variables } from "../../types";
-import { use } from "hono/jsx";
+import { isAuthenticated } from "@/middleware/auth";
+import { env } from "@/config/env";
+import { Variables } from "@/types";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -99,20 +98,12 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
     cost: 10,
   });
 
-  // fetch user location from lat & lon
-  let location;
-  if (body.location && body.location.length === 2) {
-    const [lat, lon] = body.location;
-    const locationResp = await reverseGeocodingAPI(lat, lon);
-    location = geoLocationSchema.parse(locationResp);
-  }
-
   const user = await prisma.user.create({
     data: {
       email: body.email,
       name: body.name,
       password,
-      location,
+      status: "Offline",
     },
   });
 
@@ -125,14 +116,33 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
   });
 });
 
-app.post("/logout", (c) => {
-  deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
-  deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
-  return c.json({
-    success: true,
-    message: "Logout successfully",
-  });
-});
+app.post(
+  "/logout",
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
+    deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
+
+    const currentUser = c.get("user");
+
+    await prisma.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        status: "Offline",
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Logout successfully",
+    });
+  }
+);
 
 app.get(
   "/me",
