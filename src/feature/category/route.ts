@@ -7,7 +7,8 @@ import { jwt } from "hono/jwt";
 import { env } from "@/config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
 import { prisma } from "@/lib/prisma";
-import { paginate } from "@/lib/utils";
+import { generateSlug, paginate } from "@/lib/utils";
+import { categoryBodySchema, categoryParamSchema } from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -55,4 +56,86 @@ app.get(
     });
   }
 );
+
+app.post(
+  "/",
+  zValidator("json", categoryBodySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const body = c.req.valid("json");
+    const slug = generateSlug(body.name);
+    const category = await prisma.category.create({
+      data: {
+        ...body,
+        slug,
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Category created successfully",
+      data: { category },
+    });
+  }
+);
+
+app.patch(
+  "/:id",
+  zValidator("json", categoryBodySchema),
+  zValidator("param", categoryParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+    const body = c.req.valid("json");
+    const slug = body.name ? generateSlug(body.name) : undefined;
+    const category = await prisma.category.update({
+      where: {
+        id: param.id,
+      },
+      data: {
+        ...body,
+        slug,
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Category updated successfully",
+      data: { category },
+    });
+  }
+);
+
+app.delete(
+  "/:id",
+  zValidator("param", categoryParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+
+    await prisma.category.delete({
+      where: {
+        id: param.id,
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Category deleted successfully",
+    });
+  }
+);
+
 export default app;
