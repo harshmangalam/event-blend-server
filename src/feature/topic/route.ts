@@ -1,14 +1,14 @@
 import { Hono } from "hono";
-import { Variables } from "../../types";
+import { Variables } from "@/types";
 import { jwt } from "hono/jwt";
-import { env } from "../../config/env";
-import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
-import { isAdmin, isAuthenticated } from "../../middleware/auth";
+import { env } from "@/config/env";
+import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
+import { isAdmin, isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { topicBodySchema, topicParamSchema } from "./schema";
-import { prisma } from "../../lib/prisma";
-import { paginationSchema } from "../../schema";
-import { paginate } from "../../lib/utils";
+import { prisma } from "@/lib/prisma";
+import { paginationSchema } from "@/schema";
+import { generateSlug, paginate } from "@/lib/utils";
 import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -24,11 +24,11 @@ app.post(
   isAdmin,
   async (c) => {
     const body = c.req.valid("json");
-    const currentUser = c.get("user");
+    const slug = generateSlug(body.name);
     const topic = await prisma.topic.create({
       data: {
         ...body,
-        userId: currentUser.id,
+        slug,
       },
     });
     return c.json(
@@ -47,40 +47,36 @@ app.post(
 app.get("/", zValidator("query", paginationSchema), async (c) => {
   const query = c.req.valid("query");
   const [take, skip] = paginate(query.page, query.pageSize);
+  const totalCount = await prisma.topic.count();
+  const totalPages = Math.ceil(totalCount / query.pageSize);
   const topics = await prisma.topic.findMany({
     orderBy: {
       createdAt: "desc",
     },
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
       _count: {
         select: {
           group: true,
+          events: true,
         },
       },
+      category: true,
     },
     take,
     skip,
   });
-  const totalCount = await prisma.topic.count();
-  const totalPages = Math.ceil(totalCount / query.pageSize);
 
   return c.json({
     success: true,
     message: "Fetch topics",
     data: {
       topics,
-      meta: {
-        totalCount,
-        totalPages,
-        page: query.page,
-        pageSize: query.pageSize,
-      },
+    },
+    meta: {
+      totalCount,
+      totalPages,
+      page: query.page,
+      pageSize: query.pageSize,
     },
   });
 });
@@ -147,9 +143,7 @@ app.patch(
       where: {
         id: param.topicId,
       },
-      data: {
-        ...body,
-      },
+      data: body,
     });
     return c.json(
       {
@@ -163,9 +157,6 @@ app.patch(
 
 app.get("/topic-options", async (c) => {
   const topics = await prisma.topic.findMany({
-    where: {
-      isActive: true,
-    },
     select: {
       id: true,
       name: true,
