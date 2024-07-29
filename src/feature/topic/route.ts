@@ -56,7 +56,7 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     include: {
       _count: {
         select: {
-          group: true,
+          groups: true,
           events: true,
         },
       },
