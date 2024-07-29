@@ -15,6 +15,7 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "../../middleware/auth";
 import { env } from "../../config/env";
 import { Variables } from "../../types";
+import { use } from "hono/jsx";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -70,6 +71,15 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
     httpOnly: true,
     path: "/",
     maxAge: REFRESH_TOKEN_EXP,
+  });
+
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      status: "Online",
+    },
   });
   return c.json({
     success: true,
