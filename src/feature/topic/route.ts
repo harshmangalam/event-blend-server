@@ -5,7 +5,11 @@ import { env } from "@/config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
 import { isAdmin, isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { topicBodySchema, topicParamSchema } from "./schema";
+import {
+  topicBodySchema,
+  topicParamSchema,
+  topicSlugParamSchema,
+} from "./schema";
 import { prisma } from "@/lib/prisma";
 import { paginationSchema } from "@/schema";
 import { generateSlug, paginate } from "@/lib/utils";
@@ -171,5 +175,79 @@ app.get("/topic-options", async (c) => {
     },
   });
 });
+
+app.get("/slug/:slug", zValidator("param", topicSlugParamSchema), async (c) => {
+  const param = c.req.valid("param");
+  const topic = await prisma.topic.findUnique({
+    where: {
+      slug: param.slug,
+    },
+    include: {
+      _count: {
+        select: {
+          events: true,
+          groups: true,
+          followedByUsers: true,
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+  return c.json({
+    success: true,
+    message: "Fetch topic details using slug",
+    data: {
+      topic,
+    },
+  });
+});
+app.get(
+  "/slug/:slug/related-topics",
+  zValidator("param", topicSlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const relatedTopic = await prisma.topic.findUnique({
+      where: {
+        slug: param.slug,
+      },
+      select: {
+        id: true,
+        category: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    const topics = await prisma.topic.findMany({
+      where: {
+        categoryId: relatedTopic?.category.id,
+        NOT: {
+          id: relatedTopic?.id,
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch related topics",
+      data: {
+        topics,
+      },
+    });
+  }
+);
 
 export default app;

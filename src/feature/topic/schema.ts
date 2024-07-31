@@ -8,5 +8,8 @@ const topicBodySchema = z.object({
 const topicParamSchema = z.object({
   topicId: z.string(),
 });
+const topicSlugParamSchema = z.object({
+  slug: z.string(),
+});
 
-export { topicBodySchema, topicParamSchema };
+export { topicBodySchema, topicParamSchema, topicSlugParamSchema };
