@@ -138,4 +138,32 @@ app.delete(
   }
 );
 
+app.get("/discover-categories", async (c) => {
+  const categories = await prisma.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+    select: {
+      name: true,
+      topics: {
+        orderBy: {
+          name: "asc",
+        },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+    },
+  });
+  return c.json({
+    success: true,
+    message: "Discover categories",
+    data: {
+      categories,
+    },
+  });
+});
+
 export default app;
