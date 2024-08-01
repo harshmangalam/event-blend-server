@@ -75,12 +75,12 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
     message: "Fetch topics",
     data: {
       topics,
-    },
-    meta: {
-      totalCount,
-      totalPages,
-      page: query.page,
-      pageSize: query.pageSize,
+      meta: {
+        totalCount,
+        totalPages,
+        page: query.page,
+        pageSize: query.pageSize,
+      },
     },
   });
 });

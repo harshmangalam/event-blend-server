@@ -46,12 +46,12 @@ app.get(
       message: "Fetch categories",
       data: {
         categories,
-      },
-      meta: {
-        totalCount,
-        totalPages,
-        page: query.page,
-        pageSize: query.pageSize,
+        meta: {
+          totalCount,
+          totalPages,
+          page: query.page,
+          pageSize: query.pageSize,
+        },
       },
     });
   }
