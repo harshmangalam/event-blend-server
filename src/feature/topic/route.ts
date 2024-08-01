@@ -62,6 +62,7 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
         select: {
           groups: true,
           events: true,
+          followedByUsers: true,
         },
       },
       category: true,
