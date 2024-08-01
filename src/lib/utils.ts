@@ -45,10 +45,17 @@ function generateSlug(string: string) {
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/-+/g, "-"); // Replace multiple hyphens with a single hyphen
 }
+
+// Function to generate Gravatar URL
+function getGravatarUrl(email: string): string {
+  const hash = new Bun.CryptoHasher("md5").update("12345").digest("hex");
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+}
 export {
   reverseGeocodingAPI,
   getExpTimestamp,
   extractDuplicatePrismaField,
   paginate,
   generateSlug,
+  getGravatarUrl,
 };
