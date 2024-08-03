@@ -12,6 +12,7 @@ import groups from "./feature/group/route";
 import locations from "./feature/location/route";
 import events from "./feature/event/route";
 import categories from "./feature/category/route";
+import users from "./feature/user/route";
 import seed from "./feature/seed/route";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -29,6 +30,7 @@ app.route("/api/groups", groups);
 app.route("/api/locations", locations);
 app.route("/api/events", events);
 app.route("/api/categories", categories);
+app.route("/api/users", users);
 app.route("/api/seed", seed);
 
 app.onError((err, c) => {
