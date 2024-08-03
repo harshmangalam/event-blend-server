@@ -9,7 +9,6 @@ import { createGroupSchema, groupParamSchema } from "./schema";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
 import { prisma, Prisma } from "../../lib/prisma";
 import { geoLocationSchema, paginationSchema } from "../../schema";
-import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -30,17 +29,15 @@ app.post(
     const { timezone, lat, lon, ...rest } =
       geoLocationSchema.parse(locationResp);
 
-    const location = await prisma.location.findFirst({
+    let location = await prisma.location.findFirst({
       where: {
         lat: new Prisma.Decimal(lat),
         lon: new Prisma.Decimal(lon),
       },
     });
 
-    let locationId = location?.id;
-
     if (!location) {
-      const newLocation = await prisma.location.create({
+      location = await prisma.location.create({
         data: {
           ...rest,
           lat: new Prisma.Decimal(lat),
@@ -48,30 +45,37 @@ app.post(
           timezone: timezone.name,
         },
       });
-
-      locationId = newLocation.id;
-    }
-
-    if (!locationId) {
-      throw new HTTPException(400, {
-        message: "Location not found",
-      });
     }
 
     const currentUser = c.get("user");
 
+    let network = await prisma.network.findUnique({
+      where: {
+        userId: currentUser.id,
+      },
+    });
+
+    if (!network) {
+      network = await prisma.network.create({
+        data: {
+          name: `${currentUser.name}'s Network`,
+          userId: currentUser.id,
+        },
+      });
+    }
     const group = await prisma.group.create({
       data: {
         name: body.name,
         description: body.description,
-        locationId,
+        locationId: location.id,
         topics: {
           connect: body.topics.map((topicId) => ({
             id: topicId,
           })),
         },
         adminId: currentUser.id,
-        networkId: body.networkId,
+        networkId: network?.id,
+        categoryId: body.categoryId,
       },
     });
 
@@ -121,7 +125,6 @@ app.get(
           select: {
             id: true,
             name: true,
-            isActive: true,
           },
         },
         network: {

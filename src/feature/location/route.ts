@@ -26,6 +26,7 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
       _count: {
         select: {
           groups: true,
+          events: true,
         },
       },
     },
@@ -34,12 +35,14 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
   return c.json({
     success: true,
     message: "Fetch locations",
-    data: { locations },
-    meta: {
-      totalCount,
-      totalPages,
-      page: query.page,
-      pageSize: query.pageSize,
+    data: {
+      locations,
+      meta: {
+        totalCount,
+        totalPages,
+        page: query.page,
+        pageSize: query.pageSize,
+      },
     },
   });
 });

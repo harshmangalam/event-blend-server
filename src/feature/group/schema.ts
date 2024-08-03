@@ -7,6 +7,7 @@ const createGroupSchema = z.object({
   name: z.string().min(1),
   description: z.string(),
   networkId: z.string().optional(),
+  categoryId: z.string(),
 });
 
 const groupParamSchema = z.object({
