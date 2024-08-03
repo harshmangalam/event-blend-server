@@ -714,3 +714,147 @@ export const groups = [
     poster: "https://images.unsplash.com/photo-1531058007626-e2c66a9b10f1",
   },
 ];
+
+export const events = [
+  {
+    address: "123 Tech Street, San Francisco, CA",
+    name: "Tech Innovators Meetup",
+    attendees: {
+      connect: [
+        {
+          email: "user61@eventblend.com",
+        },
+        {
+          email: "user62@eventblend.com",
+        },
+        {
+          email: "user63@eventblend.com",
+        },
+      ],
+    },
+    category: {
+      connect: {
+        slug: "tech",
+      },
+    },
+    group: {
+      connect: {
+        name: "Tech Innovators",
+      },
+    },
+    location: {
+      connect: {
+        lat: "37.7749",
+        lon: "-122.4194",
+      },
+    },
+    details:
+      "Join us to explore the latest technology trends and network with fellow tech enthusiasts.",
+    topics: {
+      connect: [
+        {
+          slug: "startups",
+        },
+        {
+          slug: "web-development",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    eventType: "InPerson" as const,
+  },
+  {
+    address: "456 Wellness Avenue, New York, NY",
+    name: "Health & Wellness Warriors Event",
+    attendees: {
+      connect: [
+        {
+          email: "user64@eventblend.com",
+        },
+        {
+          email: "user65@eventblend.com",
+        },
+        {
+          email: "user66@eventblend.com",
+        },
+      ],
+    },
+    category: {
+      connect: {
+        slug: "health-wellness",
+      },
+    },
+    group: {
+      connect: {
+        name: "Health & Wellness Warriors",
+      },
+    },
+    location: {
+      connect: {
+        lat: "40.7128",
+        lon: "-74.0060",
+      },
+    },
+    details:
+      "An event focused on promoting health and wellness through various activities and talks.",
+    topics: {
+      connect: [
+        {
+          slug: "fitness",
+        },
+        {
+          slug: "pilates",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1554284126-aa88f22d7ee2",
+    eventType: "InPerson" as const,
+  },
+  {
+    address: "789 Learning Lane, London, UK",
+    name: "Lifelong Learners Symposium",
+    attendees: {
+      connect: [
+        {
+          email: "user67@eventblend.com",
+        },
+        {
+          email: "user68@eventblend.com",
+        },
+        {
+          email: "user69@eventblend.com",
+        },
+      ],
+    },
+    category: {
+      connect: {
+        slug: "education",
+      },
+    },
+    group: {
+      connect: {
+        name: "Lifelong Learners",
+      },
+    },
+    location: {
+      connect: {
+        lat: "51.5074",
+        lon: "-0.1278",
+      },
+    },
+    details:
+      "A symposium dedicated to continuous learning and educational innovation.",
+    topics: {
+      connect: [
+        {
+          slug: "community",
+        },
+        {
+          slug: "networking",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    eventType: "Online" as const,
+  },
+];
