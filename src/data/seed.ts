@@ -586,3 +586,131 @@ export const locations = [
     lon: -74.0721,
   },
 ];
+
+export const groups = [
+  {
+    name: "Tech Innovators",
+    description: "Exploring the latest technology trends and innovations.",
+    category: {
+      connect: {
+        slug: "tech",
+      },
+    },
+    admin: {
+      connect: {
+        email: "user51@eventblend.com",
+      },
+    },
+    location: {
+      connect: {
+        lat: "12.9716",
+        lon: "77.5946",
+      },
+    },
+    topics: {
+      connect: [
+        {
+          slug: "startups",
+        },
+        {
+          slug: "web-development",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+  },
+  {
+    name: "Health & Wellness Warriors",
+    description: "Promoting health and wellness through various activities.",
+    category: {
+      connect: {
+        slug: "health-wellness",
+      },
+    },
+    admin: {
+      connect: {
+        email: "user52@eventblend.com",
+      },
+    },
+    location: {
+      connect: {
+        lat: "17.3850",
+        lon: "78.4867",
+      },
+    },
+    topics: {
+      connect: [
+        {
+          slug: "pilates",
+        },
+        {
+          slug: "fitness",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1554284126-aa88f22d7ee2",
+  },
+  {
+    name: "Lifelong Learners",
+    description: "A group dedicated to continuous learning and education.",
+    category: {
+      connect: {
+        slug: "education",
+      },
+    },
+    admin: {
+      connect: {
+        email: "user53@eventblend.com",
+      },
+    },
+    location: {
+      connect: {
+        lat: "25.7617",
+        lon: "-80.1918",
+      },
+    },
+    topics: {
+      connect: [
+        {
+          slug: "community",
+        },
+        {
+          slug: "networking",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+  },
+
+  {
+    name: "Social Connectors",
+    description: "Building social connections and friendships.",
+    category: {
+      connect: {
+        slug: "social",
+      },
+    },
+    admin: {
+      connect: {
+        email: "user54@eventblend.com",
+      },
+    },
+    location: {
+      connect: {
+        lat: "36.7783",
+        lon: "-119.4179",
+      },
+    },
+    topics: {
+      connect: [
+        {
+          slug: "networking",
+        },
+        {
+          slug: "community",
+        },
+      ],
+    },
+    poster: "https://images.unsplash.com/photo-1531058007626-e2c66a9b10f1",
+  },
+];

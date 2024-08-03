@@ -112,6 +112,7 @@ app.get(
         _count: {
           select: {
             members: true,
+            events: true,
           },
         },
         admin: {

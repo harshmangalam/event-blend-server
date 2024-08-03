@@ -4,7 +4,7 @@ import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { usersSeedSchema } from "./schema";
-import { categories, locations } from "@/data/seed";
+import { categories, groups, locations } from "@/data/seed";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -70,6 +70,19 @@ app.get("/locations", async (c) => {
   return c.json({
     success: true,
     message: "Location created",
+  });
+});
+
+app.get("/groups", async (c) => {
+  await prisma.group.deleteMany();
+  for await (const g of groups) {
+    await prisma.group.create({
+      data: g,
+    });
+  }
+  return c.json({
+    success: true,
+    message: "Groups created",
   });
 });
 export default app;
