@@ -1,9 +1,15 @@
 import { Hono } from "hono";
-import { Variables } from "../../types";
+import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
-import { paginationSchema } from "../../schema";
-import { prisma } from "../../lib/prisma";
-import { paginate } from "../../lib/utils";
+import { geoLocationSchema, paginationSchema } from "@/schema";
+import { Prisma, prisma } from "@/lib/prisma";
+import { paginate, reverseGeocodingAPI } from "@/lib/utils";
+import { locationBodySchema } from "./schema";
+import { jwt } from "hono/jwt";
+import { env } from "@/config/env";
+import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
+import { isAdmin, isAuthenticated } from "@/middleware/auth";
+import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -104,5 +110,56 @@ app.get("/discover-cities", async (c) => {
     },
   });
 });
+
+app.post(
+  "/",
+  zValidator("json", locationBodySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const body = c.req.valid("json");
+    const locationResp = await reverseGeocodingAPI(
+      body.coords[0],
+      body.coords[1]
+    );
+
+    const { timezone, lat, lon, ...rest } =
+      geoLocationSchema.parse(locationResp);
+
+    const location = await prisma.location.findUnique({
+      where: {
+        lat: new Prisma.Decimal(lat),
+        lon: new Prisma.Decimal(lon),
+      },
+    });
+
+    if (location) {
+      throw new HTTPException(400, {
+        message: "Coords already exists",
+      });
+    }
+
+    const newLocation = await prisma.location.create({
+      data: {
+        ...rest,
+        lat: new Prisma.Decimal(lat),
+        lon: new Prisma.Decimal(lon),
+        timezone: timezone.name,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Location created!",
+      data: {
+        location: newLocation,
+      },
+    });
+  }
+);
 
 export default app;
