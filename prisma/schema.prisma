@@ -33,12 +33,12 @@ enum EventTypeEnum {
 
 model Location {
   id        String   @id @default(cuid())
-  city      String   @unique
+  city      String
   country   String?
   state     String?
   timezone  String
-  lat       Decimal
-  lon       Decimal
+  lat       Decimal  @unique
+  lon       Decimal  @unique
   groups    Group[]
   events    Event[]
   createdAt DateTime @default(now())

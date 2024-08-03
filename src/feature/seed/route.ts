@@ -4,7 +4,7 @@ import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { usersSeedSchema } from "./schema";
-import { categories } from "@/data/seed";
+import { categories, locations } from "@/data/seed";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -59,6 +59,17 @@ app.get("/categories", async (c) => {
   return c.json({
     success: true,
     message: "Seeded categories!",
+  });
+});
+
+app.get("/locations", async (c) => {
+  await prisma.location.deleteMany();
+  await prisma.location.createMany({
+    data: locations,
+  });
+  return c.json({
+    success: true,
+    message: "Location created",
   });
 });
 export default app;

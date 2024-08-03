@@ -1,4 +1,4 @@
-async function reverseGeocodingAPI(lat: number, lon: number) {
+async function reverseGeocodingAPI(lat: string, lon: string) {
   const resp = await fetch(
     `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${Bun.env.GEOAPIFY_API_KEY}`
   );
