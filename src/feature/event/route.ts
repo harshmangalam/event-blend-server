@@ -50,6 +50,7 @@ app.get(
             },
           },
         },
+        topics: true,
         location: true,
         dates: true,
       },
@@ -131,6 +132,7 @@ app.post(
             })),
           },
         },
+        categoryId: body.categoryId,
       },
     });
 

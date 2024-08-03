@@ -13,4 +13,5 @@ export const createEventSchema = z.object({
   address: z.string(),
   locationCoords: locationSchema,
   dates: z.array(eventDateSchema),
+  categoryId: z.string(),
 });
