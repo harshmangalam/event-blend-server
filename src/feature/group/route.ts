@@ -203,6 +203,13 @@ app.get("/popular-groups", async (c) => {
           country: true,
         },
       },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
     orderBy: {
       members: {
@@ -243,6 +250,13 @@ app.get("/discover-groups", async (c) => {
           city: true,
           state: true,
           country: true,
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
         },
       },
     },

@@ -93,18 +93,17 @@ app.get("/discover-cities", async (c) => {
     },
   });
 
-  const results = locations.reduce<{
-    [country: string]: string[];
-  }>((acc, location) => {
-    const { country, city } = location;
-    if (country) {
-      if (!acc[country]) {
-        acc[country] = [];
+  const results = locations.reduce<{ [key: string]: any[] }>(
+    (acc, { country, ...rest }) => {
+      if (!acc[country!]) {
+        acc[country!] = [];
       }
-      acc[country].push(city);
-    }
-    return acc;
-  }, {});
+      acc[country!].push({ ...rest });
+      return acc;
+    },
+    {}
+  );
+
   return c.json({
     success: true,
     message: "Fetch popular cities",
