@@ -49,7 +49,7 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
 
 app.get("/popular-cities", async (c) => {
   const locations = await prisma.location.findMany({
-    take: 5,
+    take: 6,
     select: {
       id: true,
       city: true,
