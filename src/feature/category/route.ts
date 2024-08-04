@@ -165,5 +165,32 @@ app.get("/discover-categories", async (c) => {
     },
   });
 });
+app.get("/top-categories", async (c) => {
+  const categories = await prisma.category.findMany({
+    take: 6,
+    orderBy: {
+      groups: {
+        _count: "desc",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      _count: {
+        select: {
+          groups: true,
+        },
+      },
+    },
+  });
+  return c.json({
+    success: true,
+    message: "Top categories",
+    data: {
+      categories,
+    },
+  });
+});
 
 export default app;
