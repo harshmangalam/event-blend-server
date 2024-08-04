@@ -165,7 +165,7 @@ app.get("/discover-categories", async (c) => {
     },
   });
 });
-app.get("/top-categories", async (c) => {
+app.get("/popular-categories", async (c) => {
   const categories = await prisma.category.findMany({
     take: 6,
     orderBy: {
