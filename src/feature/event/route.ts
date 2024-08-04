@@ -146,4 +146,60 @@ app.post(
   }
 );
 
+app.get("/popular-events", async (c) => {
+  const events = await prisma.event.findMany({
+    take: 4,
+    orderBy: {
+      attendees: {
+        _count: "desc",
+      },
+    },
+    include: {
+      _count: {
+        select: {
+          attendees: true,
+        },
+      },
+      group: {
+        select: {
+          id: true,
+          name: true,
+          admin: {
+            select: {
+              profilePhoto: true,
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      topics: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+      location: {
+        select: {
+          id: true,
+          city: true,
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Popular events",
+    data: { events },
+  });
+});
 export default app;
