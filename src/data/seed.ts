@@ -590,6 +590,7 @@ export const locations = [
 export const groups = [
   {
     name: "Tech Innovators",
+    slug: "tech-innovators",
     description: "Exploring the latest technology trends and innovations.",
     category: {
       connect: {
@@ -617,10 +618,12 @@ export const groups = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    poster:
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     name: "Health & Wellness Warriors",
+    slug: "health-wellness-warriors",
     description: "Promoting health and wellness through various activities.",
     category: {
       connect: {
@@ -648,10 +651,12 @@ export const groups = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1554284126-aa88f22d7ee2",
+    poster:
+      "https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     name: "Lifelong Learners",
+    slug: "lifelong-learners",
     description: "A group dedicated to continuous learning and education.",
     category: {
       connect: {
@@ -679,11 +684,12 @@ export const groups = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    poster:
+      "https://plus.unsplash.com/premium_photo-1661609005613-2cebc95ac583?q=80&w=2982&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
-
   {
     name: "Social Connectors",
+    slug: "social-connectors",
     description: "Building social connections and friendships.",
     category: {
       connect: {
@@ -711,7 +717,8 @@ export const groups = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1531058007626-e2c66a9b10f1",
+    poster:
+      "https://images.unsplash.com/photo-1519923834699-ef0b7cde4712?q=80&w=2875&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
 
@@ -760,7 +767,8 @@ export const events = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    poster:
+      "https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     eventType: "InPerson" as const,
   },
   {
@@ -807,7 +815,8 @@ export const events = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1554284126-aa88f22d7ee2",
+    poster:
+      "https://plus.unsplash.com/premium_photo-1661716019924-e67db3947f42?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     eventType: "InPerson" as const,
   },
   {
@@ -854,7 +863,8 @@ export const events = [
         },
       ],
     },
-    poster: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    poster:
+      "https://plus.unsplash.com/premium_photo-1671305281038-82bfd20b3ded?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     eventType: "Online" as const,
   },
 ];

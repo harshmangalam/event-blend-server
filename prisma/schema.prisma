@@ -79,6 +79,7 @@ model Topic {
 model Group {
   id          String        @id @default(cuid())
   name        String        @unique
+  slug        String        @unique
   description String
   poster      String?
   topics      Topic[]

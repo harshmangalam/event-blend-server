@@ -98,4 +98,5 @@ app.get("/events", async (c) => {
     message: "Events created",
   });
 });
+
 export default app;
