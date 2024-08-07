@@ -160,73 +160,6 @@ app.get(
   }
 );
 
-app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
-  const param = c.req.valid("param");
-  const group = await prisma.group.findUnique({
-    where: {
-      slug: param.slug,
-    },
-    include: {
-      _count: {
-        select: {
-          members: true,
-          events: true,
-        },
-      },
-      admin: {
-        select: {
-          id: true,
-          name: true,
-          profilePhoto: true,
-        },
-      },
-      topics: {
-        select: {
-          slug: true,
-          id: true,
-          name: true,
-        },
-      },
-      network: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      location: {
-        select: {
-          id: true,
-          city: true,
-          state: true,
-          country: true,
-        },
-      },
-    },
-  });
-
-  return c.json({
-    success: true,
-    message: "Fetch group by slug",
-    data: { group },
-  });
-});
-app.delete("/:groupId", zValidator("param", groupParamSchema), async (c) => {
-  const param = c.req.valid("param");
-
-  await prisma.group.delete({
-    where: {
-      id: param.groupId,
-    },
-  });
-  return c.json(
-    {
-      success: true,
-      message: "Group deleted successfully",
-    },
-    201
-  );
-});
-
 app.get("/popular-groups", async (c) => {
   const groups = await prisma.group.findMany({
     take: 4,
@@ -323,6 +256,57 @@ app.get("/discover-groups", async (c) => {
     success: true,
     message: "Discover groups",
     data: { groups },
+  });
+});
+
+app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
+  const param = c.req.valid("param");
+  const group = await prisma.group.findUnique({
+    where: {
+      slug: param.slug,
+    },
+    include: {
+      _count: {
+        select: {
+          members: true,
+          events: true,
+        },
+      },
+      admin: {
+        select: {
+          id: true,
+          name: true,
+          profilePhoto: true,
+        },
+      },
+      topics: {
+        select: {
+          slug: true,
+          id: true,
+          name: true,
+        },
+      },
+      network: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      location: {
+        select: {
+          id: true,
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Fetch group by slug",
+    data: { group },
   });
 });
 
