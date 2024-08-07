@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAuthenticated } from "../../middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { createGroupSchema, groupParamSchema } from "./schema";
+import { createGroupSchema, groupParamSchema, groupSlugSchema } from "./schema";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
 import { prisma, Prisma } from "../../lib/prisma";
 import { geoLocationSchema, paginationSchema } from "../../schema";
@@ -158,6 +158,56 @@ app.get(
   }
 );
 
+app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
+  const param = c.req.valid("param");
+  const group = await prisma.group.findUnique({
+    where: {
+      slug: param.slug,
+    },
+    include: {
+      _count: {
+        select: {
+          members: true,
+          events: true,
+        },
+      },
+      admin: {
+        select: {
+          id: true,
+          name: true,
+          profilePhoto: true,
+        },
+      },
+      topics: {
+        select: {
+          slug: true,
+          id: true,
+          name: true,
+        },
+      },
+      network: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      location: {
+        select: {
+          id: true,
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Fetch group by slug",
+    data: { group },
+  });
+});
 app.delete("/:groupId", zValidator("param", groupParamSchema), async (c) => {
   const param = c.req.valid("param");
 
