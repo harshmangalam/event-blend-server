@@ -1,14 +1,14 @@
 import { Hono } from "hono";
-import { Variables } from "../../types";
+import { Variables } from "@/types";
 import { jwt } from "hono/jwt";
-import { env } from "../../config/env";
-import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
-import { isAuthenticated } from "../../middleware/auth";
+import { env } from "@/config/env";
+import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
+import { isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import { createGroupSchema, groupParamSchema, groupSlugSchema } from "./schema";
-import { paginate, reverseGeocodingAPI } from "../../lib/utils";
-import { prisma, Prisma } from "../../lib/prisma";
-import { geoLocationSchema, paginationSchema } from "../../schema";
+import { generateSlug, paginate, reverseGeocodingAPI } from "@/lib/utils";
+import { prisma, Prisma } from "@/lib/prisma";
+import { geoLocationSchema, paginationSchema } from "@/schema";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -48,6 +48,7 @@ app.post(
     }
 
     const currentUser = c.get("user");
+    const slug = generateSlug(body.name);
 
     let network = await prisma.network.findUnique({
       where: {
@@ -68,6 +69,7 @@ app.post(
         name: body.name,
         description: body.description,
         locationId: location.id,
+        slug,
         topics: {
           connect: body.topics.map((topicId) => ({
             id: topicId,
