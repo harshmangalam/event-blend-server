@@ -80,14 +80,9 @@ app.get("/discover-cities", async (c) => {
       id: true,
       city: true,
       country: true,
-      _count: {
-        select: {
-          groups: true,
-        },
-      },
     },
     orderBy: {
-      groups: {
+      events: {
         _count: "desc",
       },
     },
