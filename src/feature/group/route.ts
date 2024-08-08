@@ -311,27 +311,23 @@ app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
   });
 });
 
-app.get(
-  "/:slug/description",
-  zValidator("param", groupSlugSchema),
-  async (c) => {
-    const param = c.req.valid("param");
-    const group = await prisma.group.findUnique({
-      where: {
-        slug: param.slug,
-      },
-      select: {
-        description: true,
-      },
-    });
+app.get("/:slug/details", zValidator("param", groupSlugSchema), async (c) => {
+  const param = c.req.valid("param");
+  const group = await prisma.group.findUnique({
+    where: {
+      slug: param.slug,
+    },
+    select: {
+      description: true,
+    },
+  });
 
-    return c.json({
-      success: true,
-      message: "Fetch group by slug",
-      data: { group },
-    });
-  }
-);
+  return c.json({
+    success: true,
+    message: "Fetch group by slug",
+    data: { group },
+  });
+});
 
 app.patch(
   "/:groupId",

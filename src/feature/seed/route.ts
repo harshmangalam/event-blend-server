@@ -61,6 +61,39 @@ app.get("/categories", async (c) => {
     message: "Seeded categories!",
   });
 });
+app.get("/groups", async (c) => {
+  await prisma.group.deleteMany();
+  await prisma.groupMember.deleteMany();
+  for (const g of groups) {
+    const { members = [], ...rest } = g;
+    const group = await prisma.group.create({
+      data: rest,
+    });
+    if (members.length) {
+      for (const member of members) {
+        await prisma.groupMember.create({
+          data: {
+            group: {
+              connect: {
+                id: group.id,
+              },
+            },
+            role: member.role,
+            user: {
+              connect: {
+                email: member.email,
+              },
+            },
+          },
+        });
+      }
+    }
+  }
+  return c.json({
+    success: true,
+    message: "Groups created",
+  });
+});
 
 app.get("/locations", async (c) => {
   await prisma.location.deleteMany();
@@ -70,19 +103,6 @@ app.get("/locations", async (c) => {
   return c.json({
     success: true,
     message: "Location created",
-  });
-});
-
-app.get("/groups", async (c) => {
-  await prisma.group.deleteMany();
-  for await (const g of groups) {
-    await prisma.group.create({
-      data: g,
-    });
-  }
-  return c.json({
-    success: true,
-    message: "Groups created",
   });
 });
 

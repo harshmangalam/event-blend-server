@@ -620,6 +620,33 @@ export const groups = [
     },
     poster:
       "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+
+    members: [
+      {
+        email: "user101@eventblend.com",
+        role: "Member" as const,
+      },
+      {
+        email: "user52@eventblend.com",
+        role: "Member" as const,
+      },
+      {
+        email: "user53@eventblend.com",
+        role: "Member" as const,
+      },
+      {
+        email: "user102@eventblend.com",
+        role: "Organizer" as const,
+      },
+      {
+        email: "user102@eventblend.com",
+        role: "EventOrganizer" as const,
+      },
+      {
+        email: "user102@eventblend.com",
+        role: "AssistantOrganizer" as const,
+      },
+    ],
   },
   {
     name: "Health & Wellness Warriors",

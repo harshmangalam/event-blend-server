@@ -69,7 +69,7 @@ model Topic {
   slug            String   @unique
   groups          Group[]
   events          Event[]
-  category        Category @relation(fields: [categoryId], references: [id])
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId      String
   followedByUsers User[]
   createdAt       DateTime @default(now())
@@ -85,13 +85,13 @@ model Group {
   topics      Topic[]
   events      Event[]
   members     GroupMember[]
-  location    Location      @relation(references: [id], fields: [locationId])
-  locationId  String
-  category    Category      @relation(references: [id], fields: [categoryId])
-  categoryId  String
-  admin       User          @relation(fields: [adminId], references: [id])
+  location    Location?     @relation(references: [id], fields: [locationId], onDelete: SetNull)
+  locationId  String?
+  category    Category?     @relation(references: [id], fields: [categoryId], onDelete: SetNull)
+  categoryId  String?
+  admin       User          @relation(fields: [adminId], references: [id], onDelete: Cascade)
   adminId     String
-  network     Network?      @relation(fields: [networkId], references: [id])
+  network     Network?      @relation(fields: [networkId], references: [id], onDelete: SetNull)
   networkId   String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -99,9 +99,9 @@ model Group {
 
 model GroupMember {
   id        String           @id @default(cuid())
-  group     Group?           @relation(fields: [groupId], references: [id])
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId   String
-  user      User             @relation(fields: [userId], references: [id])
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   role      GroupMemberRole? @default(Member)
   createdAt DateTime         @default(now())
@@ -134,7 +134,7 @@ model Category {
 model Event {
   id         String        @id @default(cuid())
   name       String
-  group      Group         @relation(references: [id], fields: [groupId])
+  group      Group         @relation(references: [id], fields: [groupId], onDelete: Cascade)
   groupId    String
   poster     String?
   location   Location      @relation(references: [id], fields: [locationId])
@@ -144,8 +144,8 @@ model Event {
   attendees  User[]
   address    String
   eventType  EventTypeEnum @default(InPerson)
-  category   Category      @relation(fields: [categoryId], references: [id])
-  categoryId String
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?
   topics     Topic[]
 
   createdAt DateTime @default(now())
