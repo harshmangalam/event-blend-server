@@ -5,7 +5,12 @@ import { env } from "@/config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
 import { isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
-import { createGroupSchema, groupParamSchema, groupSlugSchema } from "./schema";
+import {
+  createGroupSchema,
+  groupParamSchema,
+  groupSlugSchema,
+  updateGroupSchema,
+} from "./schema";
 import { generateSlug, paginate, reverseGeocodingAPI } from "@/lib/utils";
 import { prisma, Prisma } from "@/lib/prisma";
 import { geoLocationSchema, paginationSchema } from "@/schema";
@@ -288,12 +293,6 @@ app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
           name: true,
         },
       },
-      network: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
       location: {
         select: {
           id: true,
@@ -311,5 +310,53 @@ app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
     data: { group },
   });
 });
+
+app.get(
+  "/:slug/description",
+  zValidator("param", groupSlugSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const group = await prisma.group.findUnique({
+      where: {
+        slug: param.slug,
+      },
+      select: {
+        description: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch group by slug",
+      data: { group },
+    });
+  }
+);
+
+app.patch(
+  "/:groupId",
+  zValidator("param", groupParamSchema),
+  zValidator("json", updateGroupSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const body = c.req.valid("json");
+    const param = c.req.valid("param");
+
+    await prisma.group.update({
+      where: {
+        id: param.groupId,
+      },
+      data: body,
+    });
+    return c.json({
+      success: true,
+      message: "Updated group!",
+    });
+  }
+);
 
 export default app;

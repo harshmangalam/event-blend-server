@@ -18,4 +18,14 @@ const groupSlugSchema = z.object({
   slug: z.string(),
 });
 
-export { createGroupSchema, groupParamSchema, groupSlugSchema };
+const updateGroupSchema = z.object({
+  name: z.string().min(1),
+  description: z.string(),
+});
+
+export {
+  createGroupSchema,
+  groupParamSchema,
+  groupSlugSchema,
+  updateGroupSchema,
+};
