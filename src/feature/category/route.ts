@@ -141,13 +141,17 @@ app.delete(
 app.get("/discover-categories", async (c) => {
   const categories = await prisma.category.findMany({
     orderBy: {
-      name: "asc",
+      events: {
+        _count: "desc",
+      },
     },
     select: {
       name: true,
       topics: {
         orderBy: {
-          name: "asc",
+          events: {
+            _count: "desc",
+          },
         },
         select: {
           id: true,
