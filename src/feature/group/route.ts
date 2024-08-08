@@ -179,6 +179,7 @@ app.get("/popular-groups", async (c) => {
         select: {
           id: true,
           name: true,
+          slug: true,
         },
       },
       location: {
@@ -228,6 +229,7 @@ app.get("/discover-groups", async (c) => {
         select: {
           id: true,
           name: true,
+          slug: true,
         },
       },
       location: {
