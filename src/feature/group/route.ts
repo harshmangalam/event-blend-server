@@ -7,6 +7,7 @@ import { isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import {
   createGroupSchema,
+  groupNearByParamSchema,
   groupParamSchema,
   groupSlugSchema,
   updateGroupSchema,
@@ -265,6 +266,46 @@ app.get("/discover-groups", async (c) => {
     data: { groups },
   });
 });
+
+app.get(
+  "/near-by/:lat/:lon",
+  zValidator("param", groupNearByParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const locationResp = await reverseGeocodingAPI(param.lat, param.lon);
+    const { city, country } = geoLocationSchema.parse(locationResp);
+
+    const groups = await prisma.group.findMany({
+      where: {
+        location: {
+          city,
+          country,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+      orderBy: {
+        members: {
+          _count: "desc",
+        },
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Near by groups",
+      data: { groups },
+    });
+  }
+);
 
 app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
   const param = c.req.valid("param");

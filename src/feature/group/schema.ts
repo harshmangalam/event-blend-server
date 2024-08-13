@@ -23,9 +23,15 @@ const updateGroupSchema = z.object({
   description: z.string(),
 });
 
+const groupNearByParamSchema = z.object({
+  lat: z.string(),
+  lon: z.string(),
+});
+
 export {
   createGroupSchema,
   groupParamSchema,
   groupSlugSchema,
   updateGroupSchema,
+  groupNearByParamSchema,
 };
