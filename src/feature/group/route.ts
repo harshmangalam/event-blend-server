@@ -286,6 +286,7 @@ app.get(
         id: true,
         name: true,
         slug: true,
+        poster: true,
         _count: {
           select: {
             members: true,
