@@ -7,7 +7,7 @@ import { isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import {
   createGroupSchema,
-  groupNearByParamSchema,
+  groupNearByQuerySchema,
   groupParamSchema,
   groupSlugSchema,
   updateGroupSchema,
@@ -267,46 +267,49 @@ app.get("/discover-groups", async (c) => {
   });
 });
 
-app.get(
-  "/near-by/:lat/:lon",
-  zValidator("param", groupNearByParamSchema),
-  async (c) => {
-    const param = c.req.valid("param");
-    const locationResp = await reverseGeocodingAPI(param.lat, param.lon);
-    const { city, country } = geoLocationSchema.parse(locationResp);
+app.get("/near-by", zValidator("query", groupNearByQuerySchema), async (c) => {
+  const query = c.req.valid("query");
+  const locationResp = await reverseGeocodingAPI(query.lat, query.lon);
+  const groups = await prisma.group.findMany({
+    where: {
+      topics: {
+        some: {
+          slug: query.slug,
+        },
+      },
+      location:
+        locationResp?.city && locationResp?.country
+          ? {
+              city: locationResp?.city,
+              country: locationResp?.country,
+            }
+          : undefined,
+    },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      poster: true,
+      _count: {
+        select: {
+          members: true,
+        },
+      },
+    },
+    orderBy: {
+      members: {
+        _count: "desc",
+      },
+    },
+    take: 4,
+  });
 
-    const groups = await prisma.group.findMany({
-      where: {
-        location: {
-          city,
-          country,
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        poster: true,
-        _count: {
-          select: {
-            members: true,
-          },
-        },
-      },
-      orderBy: {
-        members: {
-          _count: "desc",
-        },
-      },
-    });
-
-    return c.json({
-      success: true,
-      message: "Near by groups",
-      data: { groups },
-    });
-  }
-);
+  return c.json({
+    success: true,
+    message: "Near by groups",
+    data: { groups },
+  });
+});
 
 app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
   const param = c.req.valid("param");
