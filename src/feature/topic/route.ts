@@ -13,7 +13,6 @@ import {
 import { prisma } from "@/lib/prisma";
 import { paginationSchema } from "@/schema";
 import { generateSlug, paginate } from "@/lib/utils";
-import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -86,24 +85,6 @@ app.get("/", zValidator("query", paginationSchema), async (c) => {
   });
 });
 
-app.get("/:topicId", zValidator("param", topicParamSchema), async (c) => {
-  const param = c.req.valid("param");
-  const topic = await prisma.topic.findUnique({
-    where: {
-      id: param.topicId,
-    },
-  });
-  if (!topic) {
-    throw new HTTPException(404, { message: "Topic not found" });
-  }
-  return c.json({
-    success: true,
-    message: "Fetch topic by id",
-    data: {
-      topic,
-    },
-  });
-});
 app.delete(
   "/:topicId",
   zValidator("param", topicParamSchema),
@@ -177,7 +158,7 @@ app.get("/topic-options", async (c) => {
   });
 });
 
-app.get("/slug/:slug", zValidator("param", topicSlugParamSchema), async (c) => {
+app.get("/:slug", zValidator("param", topicSlugParamSchema), async (c) => {
   const param = c.req.valid("param");
   const topic = await prisma.topic.findUnique({
     where: {
@@ -209,7 +190,7 @@ app.get("/slug/:slug", zValidator("param", topicSlugParamSchema), async (c) => {
   });
 });
 app.get(
-  "/slug/:slug/related-topics",
+  "/:slug/related-topics",
   zValidator("param", topicSlugParamSchema),
   async (c) => {
     const param = c.req.valid("param");
@@ -251,4 +232,138 @@ app.get(
   }
 );
 
+app.get(
+  "/:slug/largest-groups",
+  zValidator("param", topicSlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+
+    const groups = await prisma.group.findMany({
+      where: {
+        topics: {
+          some: {
+            slug: param.slug,
+          },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+        admin: {
+          select: {
+            id: true,
+            name: true,
+            profilePhoto: true,
+          },
+        },
+        location: {
+          select: {
+            city: true,
+            country: true,
+          },
+        },
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch largest groups of this topics",
+      data: {
+        groups,
+      },
+    });
+  }
+);
+
+app.get(
+  "/:slug/near-by",
+  zValidator("param", topicSlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    // const locationResp = await reverseGeocodingAPI(query.lat, query.lon);
+    const groups = await prisma.group.findMany({
+      where: {
+        topics: {
+          some: {
+            slug: param.slug,
+          },
+        },
+        // location:
+        //   locationResp?.city && locationResp?.country
+        //     ? {
+        //         city: locationResp?.city,
+        //         country: locationResp?.country,
+        //       }
+        //     : undefined,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        poster: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+      orderBy: {
+        members: {
+          _count: "desc",
+        },
+      },
+      take: 4,
+    });
+
+    return c.json({
+      success: true,
+      message: "Near by groups",
+      data: { groups },
+    });
+  }
+);
+app.get(
+  "/:slug/newest-groups",
+  zValidator("param", topicSlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    // const locationResp = await reverseGeocodingAPI(query.lat, query.lon);
+    const groups = await prisma.group.findMany({
+      where: {
+        topics: {
+          some: {
+            slug: param.slug,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        poster: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 6,
+    });
+
+    return c.json({
+      success: true,
+      message: "Near by groups",
+      data: { groups },
+    });
+  }
+);
 export default app;

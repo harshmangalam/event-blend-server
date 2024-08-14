@@ -267,50 +267,6 @@ app.get("/discover-groups", async (c) => {
   });
 });
 
-app.get("/near-by", zValidator("query", groupNearByQuerySchema), async (c) => {
-  const query = c.req.valid("query");
-  const locationResp = await reverseGeocodingAPI(query.lat, query.lon);
-  const groups = await prisma.group.findMany({
-    where: {
-      topics: {
-        some: {
-          slug: query.slug,
-        },
-      },
-      location:
-        locationResp?.city && locationResp?.country
-          ? {
-              city: locationResp?.city,
-              country: locationResp?.country,
-            }
-          : undefined,
-    },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      poster: true,
-      _count: {
-        select: {
-          members: true,
-        },
-      },
-    },
-    orderBy: {
-      members: {
-        _count: "desc",
-      },
-    },
-    take: 4,
-  });
-
-  return c.json({
-    success: true,
-    message: "Near by groups",
-    data: { groups },
-  });
-});
-
 app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
   const param = c.req.valid("param");
   const group = await prisma.group.findUnique({
