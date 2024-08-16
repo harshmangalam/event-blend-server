@@ -8,7 +8,11 @@ import { env } from "@/config/env";
 import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, paginate } from "@/lib/utils";
-import { categoryBodySchema, categoryParamSchema } from "./schema";
+import {
+  categoryBodySchema,
+  categoryParamSchema,
+  categorySlugParamSchema,
+} from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -193,6 +197,32 @@ app.get("/popular-categories", async (c) => {
     message: "Top categories",
     data: {
       categories,
+    },
+  });
+});
+
+app.get("/:slug", zValidator("param", categorySlugParamSchema), async (c) => {
+  const param = c.req.valid("param");
+
+  const category = await prisma.category.findUnique({
+    where: {
+      slug: param.slug,
+    },
+    include: {
+      _count: {
+        select: {
+          events: true,
+          groups: true,
+        },
+      },
+      topics: true,
+    },
+  });
+  return c.json({
+    message: "Fetch category details from slug",
+    success: true,
+    data: {
+      category,
     },
   });
 });
