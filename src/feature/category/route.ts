@@ -266,4 +266,41 @@ app.get(
   }
 );
 
+app.get(
+  "/:slug/topics",
+  zValidator("param", categorySlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const topics = await prisma.topic.findMany({
+      where: {
+        category: {
+          slug: param.slug,
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        groups: {
+          take: 1,
+          select: {
+            poster: true,
+          },
+          orderBy: {
+            members: {
+              _count: "desc",
+            },
+          },
+        },
+      },
+    });
+    return c.json({
+      message: "Fetch all topics for this category",
+      success: true,
+      data: {
+        topics,
+      },
+    });
+  }
+);
 export default app;
