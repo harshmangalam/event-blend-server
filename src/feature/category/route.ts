@@ -303,4 +303,26 @@ app.get(
     });
   }
 );
+
+app.get(
+  "/:slug/topics",
+  zValidator("param", categorySlugParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const topics = await prisma.event.findMany({
+      where: {
+        category: {
+          slug: param.slug,
+        },
+      },
+    });
+    return c.json({
+      message: "Fetch popular events for this category",
+      success: true,
+      data: {
+        topics,
+      },
+    });
+  }
+);
 export default app;
