@@ -228,7 +228,7 @@ app.get("/:slug", zValidator("param", categorySlugParamSchema), async (c) => {
 });
 
 app.get(
-  "/:slug/trendings",
+  "/:slug/trending-topics",
   zValidator("param", categorySlugParamSchema),
   async (c) => {
     const param = c.req.valid("param");
