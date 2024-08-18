@@ -309,7 +309,7 @@ app.get(
   zValidator("param", categorySlugParamSchema),
   async (c) => {
     const param = c.req.valid("param");
-    const topics = await prisma.event.findMany({
+    const events = await prisma.event.findMany({
       where: {
         category: {
           slug: param.slug,
@@ -317,15 +317,22 @@ app.get(
       },
       select: {
         id: true,
+        name: true,
         poster: true,
         details: true,
+        group: {
+          select: {
+            id: true,
+            slug: true,
+          },
+        },
       },
     });
     return c.json({
       message: "Fetch popular events for this category",
       success: true,
       data: {
-        topics,
+        events,
       },
     });
   }
