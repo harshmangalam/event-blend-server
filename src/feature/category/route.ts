@@ -305,7 +305,7 @@ app.get(
 );
 
 app.get(
-  "/:slug/topics",
+  "/:slug/events",
   zValidator("param", categorySlugParamSchema),
   async (c) => {
     const param = c.req.valid("param");
@@ -314,6 +314,11 @@ app.get(
         category: {
           slug: param.slug,
         },
+      },
+      select: {
+        id: true,
+        poster: true,
+        details: true,
       },
     });
     return c.json({
