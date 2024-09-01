@@ -19,8 +19,10 @@ const groupSlugSchema = z.object({
 });
 
 const updateGroupSchema = z.object({
-  name: z.string().min(1),
-  description: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  topics: z.array(z.string()),
+  location: locationSchema.optional(),
 });
 
 const groupNearByQuerySchema = z.object({
