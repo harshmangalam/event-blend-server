@@ -2,8 +2,6 @@ import { z } from "zod";
 import { locationSchema } from "../../schema";
 
 const createGroupSchema = z.object({
-  location: locationSchema,
-  topics: z.array(z.string()),
   name: z.string().min(1),
   description: z.string(),
   networkId: z.string().optional(),
@@ -19,10 +17,8 @@ const groupSlugSchema = z.object({
 });
 
 const updateGroupSchema = z.object({
-  name: z.string().optional(),
+  name: z.string(),
   description: z.string().optional(),
-  topics: z.array(z.string()),
-  location: locationSchema.optional(),
 });
 
 const groupNearByQuerySchema = z.object({
@@ -31,10 +27,19 @@ const groupNearByQuerySchema = z.object({
   slug: z.string(),
 });
 
+const updateGroupLocationSchema = z.object({
+  location: locationSchema.optional(),
+});
+const updateGroupTopicsSchema = z.object({
+  topics: z.array(z.string()),
+});
+
 export {
   createGroupSchema,
   groupParamSchema,
   groupSlugSchema,
   updateGroupSchema,
   groupNearByQuerySchema,
+  updateGroupLocationSchema,
+  updateGroupTopicsSchema,
 };

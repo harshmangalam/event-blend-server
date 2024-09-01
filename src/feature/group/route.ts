@@ -7,9 +7,9 @@ import { isAuthenticated } from "@/middleware/auth";
 import { zValidator } from "@hono/zod-validator";
 import {
   createGroupSchema,
-  groupNearByQuerySchema,
   groupParamSchema,
   groupSlugSchema,
+  updateGroupLocationSchema,
   updateGroupSchema,
 } from "./schema";
 import { generateSlug, paginate, reverseGeocodingAPI } from "@/lib/utils";
@@ -352,6 +352,60 @@ app.patch(
     return c.json({
       success: true,
       message: "Updated group!",
+    });
+  }
+);
+
+app.patch(
+  "/:groupId/location",
+  zValidator("param", groupParamSchema),
+  zValidator("json", updateGroupLocationSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const body = c.req.valid("json");
+    const param = c.req.valid("param");
+
+    const locationResp = await reverseGeocodingAPI(
+      body.location?.[0],
+      body.location?.[1]
+    );
+    const { timezone, lat, lon, ...rest } =
+      geoLocationSchema.parse(locationResp);
+
+    let location = await prisma.location.findFirst({
+      where: {
+        lat: new Prisma.Decimal(lat),
+        lon: new Prisma.Decimal(lon),
+      },
+    });
+
+    if (!location) {
+      location = await prisma.location.create({
+        data: {
+          ...rest,
+          lat: new Prisma.Decimal(lat),
+          lon: new Prisma.Decimal(lon),
+          timezone: timezone.name,
+        },
+      });
+    }
+
+    await prisma.group.update({
+      where: {
+        id: param.groupId,
+      },
+      data: {
+        locationId: location.id,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Updated group location!",
     });
   }
 );
