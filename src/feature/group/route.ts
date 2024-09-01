@@ -9,8 +9,10 @@ import {
   createGroupSchema,
   groupParamSchema,
   groupSlugSchema,
+  updateGroupCategorySchema,
   updateGroupLocationSchema,
   updateGroupSchema,
+  updateGroupTopicsSchema,
 } from "./schema";
 import { generateSlug, paginate, reverseGeocodingAPI } from "@/lib/utils";
 import { prisma, Prisma } from "@/lib/prisma";
@@ -376,6 +378,65 @@ app.patch(
     return c.json({
       success: true,
       message: "Updated group location!",
+    });
+  }
+);
+
+app.patch(
+  "/:groupId/topics",
+  zValidator("param", groupParamSchema),
+  zValidator("json", updateGroupTopicsSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const body = c.req.valid("json");
+    const param = c.req.valid("param");
+
+    await prisma.group.update({
+      where: {
+        id: param.groupId,
+      },
+      data: {
+        topics: {
+          connect: body.topics.map((topicId) => ({ id: topicId })),
+        },
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Updated group topics!",
+    });
+  }
+);
+app.patch(
+  "/:groupId/category",
+  zValidator("param", groupParamSchema),
+  zValidator("json", updateGroupCategorySchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const body = c.req.valid("json");
+    const param = c.req.valid("param");
+
+    await prisma.group.update({
+      where: {
+        id: param.groupId,
+      },
+      data: {
+        categoryId: body.categoryId,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Updated group category!",
     });
   }
 );
