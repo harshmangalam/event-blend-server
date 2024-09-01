@@ -5,7 +5,6 @@ const createGroupSchema = z.object({
   name: z.string().min(1),
   description: z.string(),
   networkId: z.string().optional(),
-  categoryId: z.string(),
 });
 
 const groupParamSchema = z.object({
@@ -34,6 +33,9 @@ const updateGroupTopicsSchema = z.object({
   topics: z.array(z.string()),
 });
 
+const updateGroupCategorySchema = z.object({
+  categoryId: z.string(),
+});
 export {
   createGroupSchema,
   groupParamSchema,
@@ -42,4 +44,5 @@ export {
   groupNearByQuerySchema,
   updateGroupLocationSchema,
   updateGroupTopicsSchema,
+  updateGroupCategorySchema,
 };

@@ -28,30 +28,6 @@ app.post(
   isAuthenticated,
   async (c) => {
     const body = c.req.valid("json");
-    const locationResp = await reverseGeocodingAPI(
-      body.location[0],
-      body.location[1]
-    );
-    const { timezone, lat, lon, ...rest } =
-      geoLocationSchema.parse(locationResp);
-
-    let location = await prisma.location.findFirst({
-      where: {
-        lat: new Prisma.Decimal(lat),
-        lon: new Prisma.Decimal(lon),
-      },
-    });
-
-    if (!location) {
-      location = await prisma.location.create({
-        data: {
-          ...rest,
-          lat: new Prisma.Decimal(lat),
-          lon: new Prisma.Decimal(lon),
-          timezone: timezone.name,
-        },
-      });
-    }
 
     const currentUser = c.get("user");
     const slug = generateSlug(body.name);
@@ -74,16 +50,10 @@ app.post(
       data: {
         name: body.name,
         description: body.description,
-        locationId: location.id,
         slug,
-        topics: {
-          connect: body.topics.map((topicId) => ({
-            id: topicId,
-          })),
-        },
+
         adminId: currentUser.id,
         networkId: network?.id,
-        categoryId: body.categoryId,
       },
     });
 
