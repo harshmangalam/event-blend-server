@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
-import { paginationSchema } from "@/schema";
+import { paginationSchema, searchSchema } from "@/schema";
 import { isAdmin, isAuthenticated } from "@/middleware/auth";
 import { jwt } from "hono/jwt";
 import { env } from "@/config/env";
@@ -337,4 +337,31 @@ app.get(
     });
   }
 );
+
+app.get("/search", zValidator("query", searchSchema), async (c) => {
+  const query = c.req.valid("query");
+  const categories = await prisma.category.findMany({
+    where: {
+      OR: [
+        {
+          slug: {
+            contains: query.q,
+          },
+          name: {
+            contains: query.q,
+          },
+        },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+  return c.json({
+    success: true,
+    message: "Search for categories",
+    data: categories,
+  });
+});
 export default app;

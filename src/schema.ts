@@ -20,4 +20,8 @@ const geoLocationSchema = z.object({
   }),
 });
 
-export { locationSchema, paginationSchema, geoLocationSchema };
+const searchSchema = z.object({
+  q: z.string().optional(),
+});
+
+export { locationSchema, paginationSchema, geoLocationSchema, searchSchema };
