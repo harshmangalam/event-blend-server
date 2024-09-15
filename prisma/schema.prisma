@@ -120,7 +120,7 @@ model Network {
   name            String   @unique
   organization    String?
   organizationUrl String?
-  user            User     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String   @unique
   groups          Group[]
   createdAt       DateTime @default(now())
