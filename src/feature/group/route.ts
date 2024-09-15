@@ -138,6 +138,36 @@ app.get(
   }
 );
 
+app.get(
+  "/pending-groups",
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const user = c.get("user");
+    const groups = await prisma.group.findMany({
+      where: {
+        adminId: user.id,
+        status: "Pending",
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch groups",
+      data: {
+        groups,
+      },
+    });
+  }
+);
+
 app.get("/popular-groups", async (c) => {
   const groups = await prisma.group.findMany({
     take: 4,
@@ -425,14 +455,16 @@ app.patch(
     const body = c.req.valid("json");
     const param = c.req.valid("param");
 
-    await prisma.group.update({
-      where: {
-        id: param.groupId,
-      },
-      data: {
-        categoryId: body.categoryId,
-      },
-    });
+    console.log(body, param);
+
+    // await prisma.group.update({
+    //   where: {
+    //     id: param.groupId,
+    //   },
+    //   data: {
+    //     categoryId: body.categoryId,
+    //   },
+    // });
 
     return c.json({
       success: true,

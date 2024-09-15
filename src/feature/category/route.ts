@@ -60,6 +60,27 @@ app.get(
     });
   }
 );
+app.get("/categories-options", zValidator("query", searchSchema), async (c) => {
+  const query = c.req.valid("query");
+  const categories = await prisma.category.findMany({
+    where: query.q
+      ? {
+          name: {
+            contains: query.q,
+          },
+        }
+      : undefined,
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+  return c.json({
+    success: true,
+    message: "fetch categories options",
+    data: categories,
+  });
+});
 
 app.post(
   "/",
@@ -338,30 +359,4 @@ app.get(
   }
 );
 
-app.get("/search", zValidator("query", searchSchema), async (c) => {
-  const query = c.req.valid("query");
-  const categories = await prisma.category.findMany({
-    where: {
-      OR: [
-        {
-          slug: {
-            contains: query.q,
-          },
-          name: {
-            contains: query.q,
-          },
-        },
-      ],
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-  return c.json({
-    success: true,
-    message: "Search for categories",
-    data: categories,
-  });
-});
 export default app;

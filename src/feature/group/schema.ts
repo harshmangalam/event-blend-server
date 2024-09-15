@@ -8,7 +8,7 @@ const createGroupSchema = z.object({
 });
 
 const groupParamSchema = z.object({
-  groupId: z.string(),
+  groupId: z.string().uuid(),
 });
 
 const groupSlugSchema = z.object({
