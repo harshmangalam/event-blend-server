@@ -9,10 +9,7 @@ import {
   createGroupSchema,
   groupParamSchema,
   groupSlugSchema,
-  updateGroupCategorySchema,
-  updateGroupLocationSchema,
   updateGroupSchema,
-  updateGroupTopicsSchema,
 } from "./schema";
 import { generateSlug, paginate, reverseGeocodingAPI } from "@/lib/utils";
 import { prisma, Prisma } from "@/lib/prisma";
@@ -30,10 +27,12 @@ app.post(
   isAuthenticated,
   async (c) => {
     const body = c.req.valid("json");
-
     const currentUser = c.get("user");
+
+    const { categoryId, description, location, name, poster, topics } = body;
     const slug = generateSlug(body.name);
 
+    // Newtork
     let network = await prisma.network.findUnique({
       where: {
         userId: currentUser.id,
@@ -48,12 +47,43 @@ app.post(
         },
       });
     }
+
+    // location
+    const locationResp = await reverseGeocodingAPI(
+      location?.[0],
+      location?.[1]
+    );
+    const { timezone, lat, lon, ...rest } =
+      geoLocationSchema.parse(locationResp);
+
+    let locationData = await prisma.location.findFirst({
+      where: {
+        lat: new Prisma.Decimal(lat),
+        lon: new Prisma.Decimal(lon),
+      },
+    });
+
+    if (!locationData) {
+      locationData = await prisma.location.create({
+        data: {
+          ...rest,
+          lat: new Prisma.Decimal(lat),
+          lon: new Prisma.Decimal(lon),
+          timezone: timezone.name,
+        },
+      });
+    }
     const group = await prisma.group.create({
       data: {
-        name: body.name,
-        description: body.description,
+        name,
+        description,
+        categoryId,
+        poster,
+        topics: {
+          connect: body.topics.map((id) => ({ id })),
+        },
+        locationId: locationData.id,
         slug,
-
         adminId: currentUser.id,
         networkId: network?.id,
       },
@@ -354,121 +384,6 @@ app.patch(
     return c.json({
       success: true,
       message: "Updated group!",
-    });
-  }
-);
-
-app.patch(
-  "/:groupId/location",
-  zValidator("param", groupParamSchema),
-  zValidator("json", updateGroupLocationSchema),
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const body = c.req.valid("json");
-    const param = c.req.valid("param");
-
-    const locationResp = await reverseGeocodingAPI(
-      body.location?.[0],
-      body.location?.[1]
-    );
-    const { timezone, lat, lon, ...rest } =
-      geoLocationSchema.parse(locationResp);
-
-    let location = await prisma.location.findFirst({
-      where: {
-        lat: new Prisma.Decimal(lat),
-        lon: new Prisma.Decimal(lon),
-      },
-    });
-
-    if (!location) {
-      location = await prisma.location.create({
-        data: {
-          ...rest,
-          lat: new Prisma.Decimal(lat),
-          lon: new Prisma.Decimal(lon),
-          timezone: timezone.name,
-        },
-      });
-    }
-
-    await prisma.group.update({
-      where: {
-        id: param.groupId,
-      },
-      data: {
-        locationId: location.id,
-      },
-    });
-
-    return c.json({
-      success: true,
-      message: "Updated group location!",
-    });
-  }
-);
-
-app.patch(
-  "/:groupId/topics",
-  zValidator("param", groupParamSchema),
-  zValidator("json", updateGroupTopicsSchema),
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const body = c.req.valid("json");
-    const param = c.req.valid("param");
-
-    await prisma.group.update({
-      where: {
-        id: param.groupId,
-      },
-      data: {
-        topics: {
-          connect: body.topics.map((topicId) => ({ id: topicId })),
-        },
-      },
-    });
-
-    return c.json({
-      success: true,
-      message: "Updated group topics!",
-    });
-  }
-);
-app.patch(
-  "/:groupId/category",
-  zValidator("param", groupParamSchema),
-  zValidator("json", updateGroupCategorySchema),
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const body = c.req.valid("json");
-    const param = c.req.valid("param");
-
-    console.log(body, param);
-
-    // await prisma.group.update({
-    //   where: {
-    //     id: param.groupId,
-    //   },
-    //   data: {
-    //     categoryId: body.categoryId,
-    //   },
-    // });
-
-    return c.json({
-      success: true,
-      message: "Updated group category!",
     });
   }
 );
