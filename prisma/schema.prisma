@@ -31,12 +31,6 @@ enum EventTypeEnum {
   InPerson
 }
 
-enum GroupStatus {
-  Pending
-  Completed
-  Banned
-}
-
 model Location {
   id        String   @id @default(cuid())
   city      String
@@ -99,7 +93,6 @@ model Group {
   adminId     String
   network     Network?      @relation(fields: [networkId], references: [id], onDelete: SetNull)
   networkId   String?
-  status      GroupStatus   @default(Pending)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
