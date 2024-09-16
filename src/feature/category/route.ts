@@ -78,7 +78,7 @@ app.get("/categories-options", zValidator("query", searchSchema), async (c) => {
   return c.json({
     success: true,
     message: "fetch categories options",
-    data: categories,
+    data: { categories },
   });
 });
 

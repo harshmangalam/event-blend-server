@@ -11,7 +11,7 @@ import {
   topicSlugParamSchema,
 } from "./schema";
 import { prisma } from "@/lib/prisma";
-import { paginationSchema } from "@/schema";
+import { paginationSchema, searchSchema } from "@/schema";
 import { generateSlug, paginate } from "@/lib/utils";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -141,8 +141,14 @@ app.patch(
   }
 );
 
-app.get("/topic-options", async (c) => {
+app.get("/topics-options", zValidator("query", searchSchema), async (c) => {
+  const query = c.req.valid("query");
   const topics = await prisma.topic.findMany({
+    where: query.q
+      ? {
+          name: { contains: query.q },
+        }
+      : undefined,
     select: {
       id: true,
       name: true,
@@ -151,7 +157,7 @@ app.get("/topic-options", async (c) => {
 
   return c.json({
     success: true,
-    message: "Fetch topics for dropdown options",
+    message: "Fetch topics for options",
     data: {
       topics,
     },
