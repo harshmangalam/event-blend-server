@@ -14,6 +14,7 @@ const isAuthenticated = createMiddleware(async (c, next) => {
       id: true,
       email: true,
       role: true,
+      name: true,
     },
   });
 
