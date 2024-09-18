@@ -157,6 +157,13 @@ app.get(
       where: {
         id: currentUser.id,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        status: true,
+        role: true,
+      },
     });
     if (!user) {
       throw new HTTPException(404, {
