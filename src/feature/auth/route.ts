@@ -116,34 +116,6 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
   });
 });
 
-app.post(
-  "/logout",
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
-    deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
-
-    const currentUser = c.get("user");
-
-    await prisma.user.update({
-      where: {
-        id: currentUser.id,
-      },
-      data: {
-        status: "Offline",
-      },
-    });
-    return c.json({
-      success: true,
-      message: "Logout successfully",
-    });
-  }
-);
-
 app.get(
   "/me",
   jwt({
@@ -163,6 +135,7 @@ app.get(
         email: true,
         status: true,
         role: true,
+        profilePhoto: true,
       },
     });
     if (!user) {
@@ -223,4 +196,38 @@ app.get(
     });
   }
 );
+
+app.post("/hi", (c) => {
+  console.log("Hii");
+  return c.json({ hello: 1 });
+});
+
+app.post(
+  "/logout",
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
+    deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
+
+    const currentUser = c.get("user");
+
+    await prisma.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        status: "Offline",
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Logout successfully",
+    });
+  }
+);
+
 export default app;
