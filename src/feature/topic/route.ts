@@ -148,30 +148,11 @@ app.get(
   zValidator("query", topicSearchSchema),
   async (c) => {
     const query = c.req.valid("query");
-    let categoryId;
 
-    if (query.groupId) {
-      const category = await prisma.group.findUnique({
-        where: {
-          id: query.groupId,
-        },
-        select: {
-          categoryId: true,
-        },
-      });
-      if (category?.categoryId) {
-        categoryId = category.categoryId;
-      }
-    }
     const topics = await prisma.topic.findMany({
       where: {
         ...(query.q ? { name: { contains: query.q } } : {}),
         ...(query.categoryId ? { categoryId: query.categoryId } : {}),
-        ...(categoryId
-          ? {
-              categoryId,
-            }
-          : {}),
       },
 
       select: {

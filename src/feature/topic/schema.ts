@@ -14,7 +14,6 @@ const topicSlugParamSchema = z.object({
 
 const topicSearchSchema = z.object({
   categoryId: z.string().optional(),
-  groupId: z.string().optional(),
 });
 export {
   topicBodySchema,
