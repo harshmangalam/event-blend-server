@@ -8,6 +8,7 @@ import { zValidator } from "@hono/zod-validator";
 import {
   topicBodySchema,
   topicParamSchema,
+  topicSearchSchema,
   topicSlugParamSchema,
 } from "./schema";
 import { prisma } from "@/lib/prisma";
@@ -141,28 +142,53 @@ app.patch(
   }
 );
 
-app.get("/topics-options", zValidator("query", searchSchema), async (c) => {
-  const query = c.req.valid("query");
-  const topics = await prisma.topic.findMany({
-    where: query.q
-      ? {
-          name: { contains: query.q },
-        }
-      : undefined,
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+app.get(
+  "/topics-options",
+  zValidator("query", searchSchema),
+  zValidator("query", topicSearchSchema),
+  async (c) => {
+    const query = c.req.valid("query");
+    let categoryId;
 
-  return c.json({
-    success: true,
-    message: "Fetch topics for options",
-    data: {
-      topics,
-    },
-  });
-});
+    if (query.groupId) {
+      const category = await prisma.group.findUnique({
+        where: {
+          id: query.groupId,
+        },
+        select: {
+          categoryId: true,
+        },
+      });
+      if (category?.categoryId) {
+        categoryId = category.categoryId;
+      }
+    }
+    const topics = await prisma.topic.findMany({
+      where: {
+        ...(query.q ? { name: { contains: query.q } } : {}),
+        ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+        ...(categoryId
+          ? {
+              categoryId,
+            }
+          : {}),
+      },
+
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch topics for options",
+      data: {
+        topics,
+      },
+    });
+  }
+);
 
 app.get("/:slug", zValidator("param", topicSlugParamSchema), async (c) => {
   const param = c.req.valid("param");

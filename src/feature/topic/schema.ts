@@ -12,4 +12,13 @@ const topicSlugParamSchema = z.object({
   slug: z.string(),
 });
 
-export { topicBodySchema, topicParamSchema, topicSlugParamSchema };
+const topicSearchSchema = z.object({
+  categoryId: z.string().optional(),
+  groupId: z.string().optional(),
+});
+export {
+  topicBodySchema,
+  topicParamSchema,
+  topicSlugParamSchema,
+  topicSearchSchema,
+};
