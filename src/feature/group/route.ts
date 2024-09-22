@@ -299,6 +299,33 @@ app.get("/discover-groups", async (c) => {
   });
 });
 
+app.get(
+  "/groups-options",
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const currentUser = c.get("user");
+    const groups = await prisma.group.findMany({
+      where: {
+        adminId: currentUser.id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch groups options",
+      data: { groups },
+    });
+  }
+);
+
 app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
   const param = c.req.valid("param");
   const group = await prisma.group.findUnique({
@@ -361,6 +388,28 @@ app.get("/:slug/details", zValidator("param", groupSlugSchema), async (c) => {
     data: { group },
   });
 });
+
+app.get(
+  "/:groupId/category",
+  zValidator("param", groupParamSchema),
+  async (c) => {
+    const param = c.req.valid("param");
+    const group = await prisma.group.findUnique({
+      where: {
+        id: param.groupId,
+      },
+      select: {
+        category: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch group by slug",
+      data: { category: group?.category },
+    });
+  }
+);
 
 app.patch(
   "/:groupId",

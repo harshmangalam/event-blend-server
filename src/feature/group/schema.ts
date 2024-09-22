@@ -11,7 +11,7 @@ const createGroupSchema = z.object({
 });
 
 const groupParamSchema = z.object({
-  groupId: z.string().uuid(),
+  groupId: z.string().cuid2(),
 });
 
 const groupSlugSchema = z.object({
