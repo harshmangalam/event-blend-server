@@ -1,11 +1,59 @@
-To install dependencies:
-```sh
+## Setup
+
+### Install dependencies
+
+```
 bun install
 ```
 
-To run:
-```sh
+### Add env variables
+
+```
+cp .env.example .env
+```
+
+### Start server
+
+```
 bun run dev
 ```
 
-open http://localhost:3000
+Setup your postgresql db
+
+### Open
+
+http://localhost:3001
+
+## Folder structure
+
+`/prisma/`
+contains prisma schema, seeds and migrations.
+
+`/src/config`
+
+- contains all configurations file like constants, env config etc.. getting used throughout the application
+
+`/src/lib`
+contains lib initialization and utility functions.
+
+`/src/middleware`
+contains auth and other middlewares.
+
+`/src/schema`
+contains global zod schema that are reusable and getting used in more than one files.
+
+`/src/types`
+contains global types i.e `Variables` type for hono etc...
+
+`/src/feature`
+contains platform feature i.e
+
+- auth
+- category
+- event
+- group
+- location
+- network
+- topic
+- user
+- etc...
