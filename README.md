@@ -24,6 +24,15 @@ Setup your postgresql db
 
 http://localhost:3001
 
+## Tech stack
+
+- Typescript
+- Bun
+- Hono
+- Prisma
+- Zod
+- Postgresql
+
 ## Folder structure
 
 - `/prisma/`
