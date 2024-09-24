@@ -82,8 +82,8 @@ app.post(
     const body = c.req.valid("json");
 
     const locationResp = await reverseGeocodingAPI(
-      body.locationCoords[0],
-      body.locationCoords[1]
+      body.location[0],
+      body.location[1]
     );
     const { timezone, lat, lon, ...rest } =
       geoLocationSchema.parse(locationResp);
@@ -127,8 +127,8 @@ app.post(
         dates: {
           createMany: {
             data: body.dates.map((date) => ({
-              endDate: new Date(date.endDate * 1000),
-              startDate: new Date(date.startDate * 1000),
+              endDate: new Date(date.endDate),
+              startDate: new Date(date.startDate),
             })),
           },
         },
