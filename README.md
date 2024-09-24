@@ -26,40 +26,38 @@ http://localhost:3001
 
 ## Folder structure
 
-### `/prisma/`
+- `/prisma/`
 
-contains prisma schema, seeds and migrations.
+  - contains prisma schema, seeds and migrations.
 
-### `/src/config`
+- `/src/config`
 
-contains all configurations file like constants, env config etc.. getting used throughout the application
+  - contains all configurations file like constants, env config etc.. getting used throughout the application
 
-### `/src/lib`
+- `/src/lib`
 
-contains lib initialization and utility functions.
+  - contains lib initialization and utility functions.
 
-### `/src/middleware`
+- `/src/middleware`
 
-contains auth and other middlewares.
+  - contains auth and other middlewares.
 
-### `/src/schema`
+- `/src/schema`
 
-contains global zod schema that are reusable and getting used in more than one files.
+  - contains global zod schema that are reusable and getting used in more than one files.
 
-### `/src/types`
+- `/src/types`
 
-contains global types i.e `Variables` type for hono etc...
+  - contains global types i.e `Variables` type for hono etc...
 
-### `/src/feature`
-
-contains platform feature i.e
-
-- auth
-- category
-- event
-- group
-- location
-- network
-- topic
-- user
-- etc...
+- `/src/feature`
+  - contains platform feature i.e
+    - auth
+    - category
+    - event
+    - group
+    - location
+    - network
+    - topic
+    - user
+    - etc...
