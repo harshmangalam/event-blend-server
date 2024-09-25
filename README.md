@@ -1,3 +1,5 @@
+# Eventblend API Server
+
 ## Setup
 
 ### Install dependencies
