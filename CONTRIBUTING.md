@@ -1,4 +1,4 @@
-## Contributing to Weird
+## Contributing to Eventblend
 
 Thanks for your help in improving the project!
 
