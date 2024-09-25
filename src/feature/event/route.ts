@@ -164,6 +164,7 @@ app.get("/popular-events", async (c) => {
         select: {
           id: true,
           name: true,
+          slug: true,
           admin: {
             select: {
               profilePhoto: true,
@@ -199,6 +200,43 @@ app.get("/popular-events", async (c) => {
   return c.json({
     success: true,
     message: "Popular events",
+    data: { events },
+  });
+});
+
+app.get("/discover-events", async (c) => {
+  const events = await prisma.event.findMany({
+    include: {
+      _count: {
+        select: {
+          attendees: true,
+        },
+      },
+      dates: true,
+      group: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+
+      category: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Discover events",
     data: { events },
   });
 });

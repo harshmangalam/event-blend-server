@@ -11,16 +11,16 @@ Even tiny pull requests (e.g., one character pull request fixing a typo in docum
 We expect you to use the following format.
 
 ```
-<username>(<scope>): <short summary>
-  │       │             │
-  │       │             └─> Summary. Not capitalized.
-  │       │
-  │       └─> Commit Scope
+<commit_type>: <short summary>
+  │                    │
+  │                    └─> Summary. Not capitalized.
+  │
+  │
   │
   └─> Commit Type: build|ci|docs|feat|fix|perf|refactor|test
 ```
 
-The `<type>` and `<summary>` fields are mandatory, the (`<scope>`) field is optional.
+The `<type>` and `<summary>` fields are mandatory.
 
 `<type>` must be one of the following:
 build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
