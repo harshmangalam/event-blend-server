@@ -70,49 +70,6 @@ app.get(
   }
 );
 
-app.get(
-  "/:id",
-  zValidator("param", eventParamSchema),
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  isAdmin,
-  async (c) => {
-    const param = c.req.valid("param");
-    const event = await prisma.event.findUnique({
-      where: {
-        id: param.id,
-      },
-      include: {
-        group: {
-          select: {
-            name: true,
-            slug: true,
-            poster: true,
-            admin: {
-              select: {
-                profilePhoto: true,
-                name: true,
-                id: true,
-              },
-            },
-          },
-        },
-        dates: true,
-        location: true,
-      },
-    });
-
-    return c.json({
-      success: true,
-      message: "Fetch events",
-      data: { event },
-    });
-  }
-);
-
 app.post(
   "/",
   zValidator("json", createEventSchema),
@@ -283,4 +240,47 @@ app.get("/discover-events", async (c) => {
     data: { events },
   });
 });
+
+app.get(
+  "/:id",
+  zValidator("param", eventParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+    const event = await prisma.event.findUnique({
+      where: {
+        id: param.id,
+      },
+      include: {
+        group: {
+          select: {
+            name: true,
+            slug: true,
+            poster: true,
+            admin: {
+              select: {
+                profilePhoto: true,
+                name: true,
+                id: true,
+              },
+            },
+          },
+        },
+        dates: true,
+        location: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch events",
+      data: { event },
+    });
+  }
+);
 export default app;
