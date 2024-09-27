@@ -90,6 +90,7 @@ app.get(
           select: {
             name: true,
             slug: true,
+            poster: true,
             admin: {
               select: {
                 profilePhoto: true,
@@ -100,6 +101,7 @@ app.get(
           },
         },
         dates: true,
+        location: true,
       },
     });
 
