@@ -145,8 +145,8 @@ model Event {
   attendees  User[]
   address    String
   eventType  EventTypeEnum @default(InPerson)
-  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  categoryId String?
+  category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
   topics     Topic[]
 
   createdAt DateTime @default(now())
