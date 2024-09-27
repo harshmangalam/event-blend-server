@@ -8,7 +8,7 @@ import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { prisma, Prisma } from "../../lib/prisma";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
-import { createEventSchema } from "./schema";
+import { createEventSchema, eventParamSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -66,6 +66,47 @@ app.get(
         page: query.page,
         pageSize: query.pageSize,
       },
+    });
+  }
+);
+
+app.get(
+  "/:id",
+  zValidator("param", eventParamSchema),
+  jwt({
+    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c) => {
+    const param = c.req.valid("param");
+    const event = await prisma.event.findUnique({
+      where: {
+        id: param.id,
+      },
+      include: {
+        group: {
+          select: {
+            name: true,
+            slug: true,
+            admin: {
+              select: {
+                profilePhoto: true,
+                name: true,
+                id: true,
+              },
+            },
+          },
+        },
+        dates: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch events",
+      data: { event },
     });
   }
 );

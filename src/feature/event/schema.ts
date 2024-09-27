@@ -16,3 +16,6 @@ export const createEventSchema = z.object({
   categoryId: z.string(),
   eventType: z.string(),
 });
+export const eventParamSchema = z.object({
+  id: z.string(),
+});
