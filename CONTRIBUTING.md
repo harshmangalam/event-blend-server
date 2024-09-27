@@ -3,6 +3,7 @@
 Thanks for your help in improving the project!
 
 ## Pull Requests
+Always create PR for `dev` branch.
 
 Even tiny pull requests (e.g., one character pull request fixing a typo in documentation) are greatly appreciated. Before making a large change, it is usually a good idea to first open an issue describing the change to solicit feedback and guidance. This will increase the likelihood of the PR getting merged.
 
