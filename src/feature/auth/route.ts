@@ -1,8 +1,9 @@
 import { Hono } from "hono";
+import nodemailer from "nodemailer"; 
 import { getExpTimestamp } from "@/lib/utils";
 import { prisma } from "../../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
-import { loginSchema, signupSchema } from "./schema";
+import { loginSchema, signupSchema, resetPasswordRequestSchema, resetPasswordSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 import { jwt, sign } from "hono/jwt";
 import {
@@ -15,8 +16,18 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "@/middleware/auth";
 import { env } from "@/config/env";
 import { Variables } from "@/types";
+import { verify } from "jsonwebtoken";
 
 const app = new Hono<{ Variables: Variables }>();
+
+// Create transporter for sending emails
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: env.EMAIL_USER, // Your email
+    pass: env.EMAIL_PASSWORD, // Your email password 
+  },
+});
 
 app.post("/login", zValidator("json", loginSchema), async (c) => {
   const body = c.req.valid("json");
@@ -92,6 +103,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
 
 app.post("/signup", zValidator("json", signupSchema), async (c) => {
   const body = c.req.valid("json");
+
   // hash password
   const password = await Bun.password.hash(body.password, {
     algorithm: "bcrypt",
@@ -197,37 +209,98 @@ app.get(
   }
 );
 
-app.post("/hi", (c) => {
-  console.log("Hii");
-  return c.json({ hello: 1 });
-});
+// Password reset request route
+app.post("/reset-password", zValidator("json", resetPasswordRequestSchema), async (c) => {
+  const body = c.req.valid("json");
 
-app.post(
-  "/logout",
-  jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
-    deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
+  const user = await prisma.user.findUnique({
+    where: { email: body.email },
+  });
 
-    const currentUser = c.get("user");
-
-    await prisma.user.update({
-      where: {
-        id: currentUser.id,
-      },
-      data: {
-        status: "Offline",
-      },
-    });
-    return c.json({
-      success: true,
-      message: "Logout successfully",
+  if (!user) {
+    throw new HTTPException(404, {
+      message: "User with this email does not exist",
     });
   }
-);
+
+  const accessToken = await sign(
+    {
+      exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+      sub: user.id,
+    },
+    env.JWT_ACEESS_TOKEN_SECRET
+  );
+
+  const resetLink = `${env.FRONTEND_URL}/reset-password?token=${accessToken}`;
+  
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: user.email,
+    subject: "Password Reset",
+    html: `
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <a href="${resetLink}">Reset Password</a>
+      <p>This link is valid for 1 hour.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+
+  return c.json({
+    success: true,
+    message: "Password reset email sent successfully",
+  });
+});
+
+// Confirm password reset route
+app.post("/reset-password/confirm", async (c) => {
+  const { token, newPassword } = await c.req.json();
+
+  try {
+    const decoded = verify(token, env.JWT_RESET_TOKEN_SECRET);
+    const userId = decoded.sub; 
+
+    const hashedPassword = await Bun.password.hash(newPassword, {
+      algorithm: "bcrypt",
+      cost: 10,
+    });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return c.json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    throw new HTTPException(400, {
+      message: "Invalid or expired token",
+    });
+  }
+});
+
+app.post("/logout", jwt({
+  secret: env.JWT_ACEESS_TOKEN_SECRET,
+  cookie: ACCESS_TOKEN_COOKIE_NAME,
+}), isAuthenticated, async (c) => {
+  deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
+  deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
+
+  const currentUser = c.get("user");
+
+  await prisma.user.update({
+    where: { id: currentUser.id },
+    data: {
+      status: "Offline",
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Logout successfully",
+  });
+});
 
 export default app;

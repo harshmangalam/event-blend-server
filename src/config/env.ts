@@ -14,17 +14,23 @@ const envSchema = z.object({
   GEOAPIFY_API_KEY: z.string().trim().min(1),
   JWT_ACEESS_TOKEN_SECRET: z.string().trim().min(1),
   JWT_REFRESH_TOKEN_SECRET: z.string().trim().min(1),
+  JWT_RESET_TOKEN_SECRET: z.string().trim().min(1), // Added for password reset token
+  EMAIL_USER: z.string().email().trim(), // Added email validation
+  EMAIL_PASSWORD: z.string().trim().min(8), // Email password validation with a minimum length
+  FRONTEND_URL: z.string().url(), // Validation for the frontend URL
 });
 
 declare module "bun" {
   interface Env extends z.infer<typeof envSchema> {}
 }
+
 const parsedEnv = envSchema.safeParse(Bun.env);
 
 if (!parsedEnv.success) {
   console.error(parsedEnv.error.issues);
   process.exit(1);
 }
+
 export const env = parsedEnv.data;
 export type Environment = {
   Bindings: z.infer<typeof envSchema>;
