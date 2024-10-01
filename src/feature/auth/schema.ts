@@ -11,5 +11,13 @@ const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
 });
+const resetPasswordRequestSchema = z.object({
+  email: z.string().email(),
+});
 
-export { signupSchema, geoLocationSchema, loginSchema };
+const resetPasswordSchema = z.object({
+  token: z.string(),
+  newPassword: z.string().min(6),
+});
+
+export { signupSchema, geoLocationSchema, loginSchema,resetPasswordRequestSchema, resetPasswordSchema };
