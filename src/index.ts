@@ -1,3 +1,4 @@
+
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { extractDuplicatePrismaField } from "./lib/utils";
@@ -19,7 +20,7 @@ const app = new Hono<{ Variables: Variables }>();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5174",
     credentials: true,
   })
 );
