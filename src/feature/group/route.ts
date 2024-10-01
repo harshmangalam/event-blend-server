@@ -180,7 +180,6 @@ app.get(
     const groups = await prisma.group.findMany({
       where: {
         adminId: user.id,
-        status: "Pending",
       },
       select: {
         id: true,

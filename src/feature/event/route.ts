@@ -8,7 +8,7 @@ import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
 import { isAdmin, isAuthenticated } from "../../middleware/auth";
 import { prisma, Prisma } from "../../lib/prisma";
 import { paginate, reverseGeocodingAPI } from "../../lib/utils";
-import { createEventSchema } from "./schema";
+import { createEventSchema, eventParamSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -164,6 +164,7 @@ app.get("/popular-events", async (c) => {
         select: {
           id: true,
           name: true,
+          slug: true,
           admin: {
             select: {
               profilePhoto: true,
@@ -200,6 +201,76 @@ app.get("/popular-events", async (c) => {
     success: true,
     message: "Popular events",
     data: { events },
+  });
+});
+
+app.get("/discover-events", async (c) => {
+  const events = await prisma.event.findMany({
+    include: {
+      _count: {
+        select: {
+          attendees: true,
+        },
+      },
+      dates: true,
+      group: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+
+      category: {
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Discover events",
+    data: { events },
+  });
+});
+
+app.get("/:id", zValidator("param", eventParamSchema), async (c) => {
+  const param = c.req.valid("param");
+  const event = await prisma.event.findUnique({
+    where: {
+      id: param.id,
+    },
+    include: {
+      group: {
+        select: {
+          name: true,
+          slug: true,
+          poster: true,
+          admin: {
+            select: {
+              profilePhoto: true,
+              name: true,
+              id: true,
+            },
+          },
+        },
+      },
+      dates: true,
+      location: true,
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Fetch events",
+    data: { event },
   });
 });
 export default app;
