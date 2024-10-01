@@ -72,3 +72,5 @@ http://localhost:3001
     - topic
     - user
     - etc...
+
+**Please go through CONTRIBUTING.md file before start contribution and code changes**.
