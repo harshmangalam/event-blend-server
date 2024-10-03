@@ -16,7 +16,7 @@ app.get(
   "/",
   zValidator("query", paginationSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -64,7 +64,7 @@ app.get(
   "/:networkId",
   zValidator("param", networkParamSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -89,7 +89,7 @@ app.post(
   "/",
   zValidator("json", networkBodySchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -122,7 +122,7 @@ app.patch(
   zValidator("param", networkParamSchema),
   zValidator("json", networkBodySchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
