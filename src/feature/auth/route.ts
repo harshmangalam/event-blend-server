@@ -255,10 +255,8 @@ app.post("/reset-password/confirm", async (c) => {
   const { token, newPassword } = await c.req.json();
 
   try {
-    const decoded = verify(token, env.JWT_SECRET);
-    const userId = decoded;
-    console.log(userId);
-    return;
+    const decoded = await verify(token, env.JWT_SECRET);
+    const userId = decoded.sub as string;
 
     const hashedPassword = await Bun.password.hash(newPassword, {
       algorithm: "bcrypt",
