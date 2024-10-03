@@ -110,6 +110,7 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
       name: body.name,
       password,
       status: "Offline",
+      gender: body.gender,
     },
   });
 
