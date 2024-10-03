@@ -19,7 +19,7 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "@/middleware/auth";
 import { env } from "@/config/env";
 import { Variables } from "@/types";
-import { transporter } from "@/config/email";
+import { transporter } from "@/lib/email";
 
 const app = new Hono<{ Variables: Variables }>();
 
