@@ -20,7 +20,7 @@ app.get(
   "/",
   zValidator("query", paginationSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -282,7 +282,7 @@ app.delete(
   "/:id",
   zValidator("param", categoryParamSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -306,7 +306,7 @@ app.patch(
   zValidator("json", categoryBodySchema),
   zValidator("param", categoryParamSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -336,7 +336,7 @@ app.post(
   "/",
   zValidator("json", categoryBodySchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,

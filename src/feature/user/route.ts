@@ -15,7 +15,7 @@ app.get(
   "/",
   zValidator("query", paginationSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,

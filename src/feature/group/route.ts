@@ -21,7 +21,7 @@ app.post(
   "/",
   zValidator("json", createGroupSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -105,7 +105,7 @@ app.get(
   "/",
   zValidator("query", paginationSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -171,7 +171,7 @@ app.get(
 app.get(
   "/pending-groups",
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -301,7 +301,7 @@ app.get("/discover-groups", async (c) => {
 app.get(
   "/groups-options",
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -415,7 +415,7 @@ app.patch(
   zValidator("param", groupParamSchema),
   zValidator("json", updateGroupSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,

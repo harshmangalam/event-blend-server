@@ -21,7 +21,7 @@ app.post(
   "/",
   zValidator("json", topicBodySchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -90,7 +90,7 @@ app.delete(
   "/:topicId",
   zValidator("param", topicParamSchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
@@ -117,7 +117,7 @@ app.patch(
   zValidator("param", topicParamSchema),
   zValidator("json", topicBodySchema),
   jwt({
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,

@@ -1,11 +1,14 @@
 import { Hono } from "hono";
-import nodemailer from "nodemailer"; 
 import { getExpTimestamp } from "@/lib/utils";
 import { prisma } from "../../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
-import { loginSchema, signupSchema, resetPasswordRequestSchema, resetPasswordSchema } from "./schema";
+import {
+  loginSchema,
+  signupSchema,
+  resetPasswordRequestSchema,
+} from "./schema";
 import { HTTPException } from "hono/http-exception";
-import { jwt, sign } from "hono/jwt";
+import { jwt, sign, verify } from "hono/jwt";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   ACCESS_TOKEN_EXP,
@@ -16,18 +19,9 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import { isAuthenticated } from "@/middleware/auth";
 import { env } from "@/config/env";
 import { Variables } from "@/types";
-import { verify } from "jsonwebtoken";
+import { transporter } from "@/config/email";
 
 const app = new Hono<{ Variables: Variables }>();
-
-// Create transporter for sending emails
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: env.EMAIL_USER, // Your email
-    pass: env.EMAIL_PASSWORD, // Your email password 
-  },
-});
 
 app.post("/login", zValidator("json", loginSchema), async (c) => {
   const body = c.req.valid("json");
@@ -61,7 +55,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       exp: getExpTimestamp(ACCESS_TOKEN_EXP),
       sub: user.id,
     },
-    env.JWT_ACEESS_TOKEN_SECRET
+    env.JWT_SECRET
   );
 
   // create refresh token
@@ -70,7 +64,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       exp: getExpTimestamp(REFRESH_TOKEN_EXP),
       sub: user.id,
     },
-    env.JWT_REFRESH_TOKEN_SECRET
+    env.JWT_SECRET
   );
   setCookie(c, ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
@@ -132,7 +126,7 @@ app.get(
   "/me",
   jwt({
     cookie: ACCESS_TOKEN_COOKIE_NAME,
-    secret: env.JWT_ACEESS_TOKEN_SECRET,
+    secret: env.JWT_SECRET,
   }),
   isAuthenticated,
   async (c) => {
@@ -167,7 +161,7 @@ app.get(
 
 app.get(
   "/refresh",
-  jwt({ secret: env.JWT_REFRESH_TOKEN_SECRET, cookie: "refreshToken" }),
+  jwt({ secret: env.JWT_SECRET, cookie: "refreshToken" }),
   async (c) => {
     const jwtPayload = c.get("jwtPayload");
 
@@ -177,7 +171,7 @@ app.get(
         exp: getExpTimestamp(ACCESS_TOKEN_EXP),
         sub: jwtPayload.sub,
       },
-      env.JWT_ACEESS_TOKEN_SECRET
+      env.JWT_SECRET
     );
 
     // create refresh token
@@ -186,7 +180,7 @@ app.get(
         exp: getExpTimestamp(REFRESH_TOKEN_EXP),
         sub: jwtPayload.sub,
       },
-      env.JWT_REFRESH_TOKEN_SECRET
+      env.JWT_SECRET
     );
     setCookie(c, ACCESS_TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
@@ -210,55 +204,61 @@ app.get(
 );
 
 // Password reset request route
-app.post("/reset-password", zValidator("json", resetPasswordRequestSchema), async (c) => {
-  const body = c.req.valid("json");
+app.post(
+  "/reset-password",
+  zValidator("json", resetPasswordRequestSchema),
+  async (c) => {
+    const body = c.req.valid("json");
 
-  const user = await prisma.user.findUnique({
-    where: { email: body.email },
-  });
-
-  if (!user) {
-    throw new HTTPException(404, {
-      message: "User with this email does not exist",
+    const user = await prisma.user.findUnique({
+      where: { email: body.email },
     });
-  }
 
-  const accessToken = await sign(
-    {
-      exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-      sub: user.id,
-    },
-    env.JWT_ACEESS_TOKEN_SECRET
-  );
+    if (!user) {
+      throw new HTTPException(404, {
+        message: "User with this email does not exist",
+      });
+    }
 
-  const resetLink = `${env.FRONTEND_URL}/reset-password?token=${accessToken}`;
-  
-  const mailOptions = {
-    from: env.EMAIL_USER,
-    to: user.email,
-    subject: "Password Reset",
-    html: `
+    const token = await sign(
+      {
+        exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+        sub: user.id,
+      },
+      env.JWT_SECRET
+    );
+
+    const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    const mailOptions = {
+      from: env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset",
+      html: `
       <p>You requested a password reset. Click the link below to reset your password:</p>
       <a href="${resetLink}">Reset Password</a>
       <p>This link is valid for 1 hour.</p>
     `,
-  };
+    };
 
-  await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
-  return c.json({
-    success: true,
-    message: "Password reset email sent successfully",
-  });
-});
+    return c.json({
+      success: true,
+      message: "Password reset email sent successfully",
+    });
+  }
+);
 
 // Confirm password reset route
 app.post("/reset-password/confirm", async (c) => {
   const { token, newPassword } = await c.req.json();
 
   try {
-    const decoded = verify(token, env.JWT_RESET_TOKEN_SECRET);
-    const userId = decoded.sub; 
+    const decoded = verify(token, env.JWT_SECRET);
+    const userId = decoded;
+    console.log(userId);
+    return;
 
     const hashedPassword = await Bun.password.hash(newPassword, {
       algorithm: "bcrypt",
@@ -281,26 +281,31 @@ app.post("/reset-password/confirm", async (c) => {
   }
 });
 
-app.post("/logout", jwt({
-  secret: env.JWT_ACEESS_TOKEN_SECRET,
-  cookie: ACCESS_TOKEN_COOKIE_NAME,
-}), isAuthenticated, async (c) => {
-  deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
-  deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
+app.post(
+  "/logout",
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    deleteCookie(c, ACCESS_TOKEN_COOKIE_NAME);
+    deleteCookie(c, REFRESH_TOKEN_COOKIE_NAME);
 
-  const currentUser = c.get("user");
+    const currentUser = c.get("user");
 
-  await prisma.user.update({
-    where: { id: currentUser.id },
-    data: {
-      status: "Offline",
-    },
-  });
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: {
+        status: "Offline",
+      },
+    });
 
-  return c.json({
-    success: true,
-    message: "Logout successfully",
-  });
-});
+    return c.json({
+      success: true,
+      message: "Logout successfully",
+    });
+  }
+);
 
 export default app;
