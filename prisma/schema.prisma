@@ -31,11 +31,6 @@ enum EventTypeEnum {
   InPerson
 }
 
-enum GenderEnum {
-  Male
-  Female
-  Other
-}
 
 model Location {
   id        String   @id @default(cuid())
