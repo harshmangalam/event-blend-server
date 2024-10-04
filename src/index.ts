@@ -14,6 +14,7 @@ import events from "./feature/event/route";
 import categories from "./feature/category/route";
 import users from "./feature/user/route";
 import seed from "./feature/seed/route";
+import interest from "./feature/interest/route";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -32,6 +33,7 @@ app.route("/api/events", events);
 app.route("/api/categories", categories);
 app.route("/api/users", users);
 app.route("/api/seed", seed);
+app.route("/api/interest",interest);
 
 app.onError((err, c) => {
   console.log(err);
