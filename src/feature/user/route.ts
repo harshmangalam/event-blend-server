@@ -10,7 +10,46 @@ import { Hono } from "hono";
 import { jwt } from "hono/jwt";
 
 const app = new Hono<{ Variables: Variables }>();
+app.patch("/updatename",
+  zValidator("query", paginationSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c)=>{
+  const body = c.req.valid("json");
+   const user=c.get("user")
+   const userid=user.id
+   const updatename=await prisma.user.update({
+    where: { id: userid },
+    data: {
+      name: body.name,
+    },
+   })
 
+})
+app.patch("/updatebio",
+  zValidator("query", paginationSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  isAdmin,
+  async (c)=>{
+  const query = c.req.valid("query");
+   const user=c.get("user")
+   const userid=user.id
+   const updatename=await prisma.user.update({
+    where: { id: userid },
+    data: {
+      bio : query.bio 
+    },
+   })
+
+})
 app.get(
   "/",
   zValidator("query", paginationSchema),
