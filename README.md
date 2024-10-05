@@ -14,6 +14,12 @@ bun install
 cp .env.example .env
 ```
 
+### Prisma migrations
+
+```
+bunx prisma migrate deploy
+```
+
 ### Start server
 
 ```
