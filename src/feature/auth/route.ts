@@ -20,6 +20,7 @@ import { isAuthenticated } from "@/middleware/auth";
 import { env } from "@/config/env";
 import { Variables } from "@/types";
 import { transporter } from "@/lib/email";
+import { GenderEnum } from "@prisma/client";
 
 const app = new Hono<{ Variables: Variables }>();
 
@@ -110,7 +111,7 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
       name: body.name,
       password,
       status: "Offline",
-      gender: body.gender,
+      gender: body.gender as GenderEnum,
     },
   });
 
