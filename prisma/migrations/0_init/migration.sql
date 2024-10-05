@@ -10,9 +10,6 @@ CREATE TYPE "GroupMemberRole" AS ENUM ('Member', 'Organizer', 'CoOrganizer', 'Ev
 -- CreateEnum
 CREATE TYPE "EventTypeEnum" AS ENUM ('Online', 'InPerson');
 
--- CreateEnum
-CREATE TYPE "GenderEnum" AS ENUM ('Male', 'Female', 'Other');
-
 -- CreateTable
 CREATE TABLE "Location" (
     "id" TEXT NOT NULL,
@@ -36,7 +33,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "bio" TEXT,
     "profilePhoto" TEXT,
-    "gender" "GenderEnum" NOT NULL,
+    "gender" TEXT NOT NULL,
     "role" "RoleEnum" NOT NULL DEFAULT 'User',
     "status" "UserStatusEnum" NOT NULL DEFAULT 'Offline',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -281,3 +278,4 @@ ALTER TABLE "_EventToTopic" ADD CONSTRAINT "_EventToTopic_A_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "_EventToTopic" ADD CONSTRAINT "_EventToTopic_B_fkey" FOREIGN KEY ("B") REFERENCES "Topic"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
