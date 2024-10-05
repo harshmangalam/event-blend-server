@@ -58,7 +58,7 @@ model User {
   password        String
   bio             String?
   profilePhoto    String?
-  gender          GenderEnum     @default(Male)
+  gender          GenderEnum?    @default(Male)
   role            RoleEnum       @default(User)
   members         GroupMember[]
   groupsAdmin     Group[]
