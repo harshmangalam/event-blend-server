@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.coerce.number().min(1000).max(65535).optional().default(3000),
+  HOST: z.string().default("0.0.0.0"),
   ENV: z
     .union([
       z.literal("development"),

@@ -33,7 +33,7 @@ app.route("/api/events", events);
 app.route("/api/categories", categories);
 app.route("/api/users", users);
 app.route("/api/seed", seed);
-app.route("/api/interest",interest);
+app.route("/api/interest", interest);
 
 app.onError((err, c) => {
   console.log(err);
@@ -77,4 +77,5 @@ app.onError((err, c) => {
 export default {
   fetch: app.fetch,
   port: env.PORT,
+  hostname: env.HOST,
 };
