@@ -31,6 +31,11 @@ enum EventTypeEnum {
   InPerson
 }
 
+enum GenderEnum {
+  Male
+  Female
+  Other
+}
 
 model Location {
   id        String   @id @default(cuid())
@@ -46,7 +51,6 @@ model Location {
   updatedAt DateTime @updatedAt
 }
 
-
 model User {
   id              String         @id @default(cuid())
   name            String
@@ -54,7 +58,7 @@ model User {
   password        String
   bio             String?
   profilePhoto    String?
-  gender          String     
+  gender          GenderEnum?    @default(Male)
   role            RoleEnum       @default(User)
   members         GroupMember[]
   groupsAdmin     Group[]
