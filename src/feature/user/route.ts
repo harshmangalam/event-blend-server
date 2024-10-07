@@ -8,29 +8,34 @@ import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { jwt } from "hono/jwt";
+import { editProfileBodySchema } from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
-app.patch("/api/user/:id/edit-profile",
-  zValidator("query", paginationSchema),
+app.patch(
+  "/edit-profile",
+  zValidator("json", editProfileBodySchema),
   jwt({
     secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
   }),
   isAuthenticated,
-  async (c)=>{
-  const body = c.req.valid("json");
-   const user=c.get("user")
-   const query = c.req.valid("query");
-   const userid=user.id
-   const updatename=await prisma.user.update({
-    where: { id: userid },
-    data: {
-      name: body.name,
-      bio : query.bio 
-    },
-   })
+  async (c) => {
+    const body = c.req.valid("json");
+    const user = c.get("user");
 
-})
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: body.name,
+        bio: body.bio,
+      },
+    });
+    return c.json({
+      success: true,
+      message: "Edid profile successfully",
+    });
+  }
+);
 app.get(
   "/",
   zValidator("query", paginationSchema),
