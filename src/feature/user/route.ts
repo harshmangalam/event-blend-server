@@ -8,7 +8,7 @@ import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { jwt } from "hono/jwt";
-import { editProfileBodySchema } from "./schema";
+import { editProfileBodySchema, profileIdParamSchema } from "./schema";
 
 const app = new Hono<{ Variables: Variables }>();
 app.patch(
@@ -75,6 +75,41 @@ app.get(
           page: query.page,
           pageSize: query.pageSize,
         },
+      },
+    });
+  }
+);
+app.get(
+  "/:id/details",
+  zValidator("param", profileIdParamSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const param = c.req.valid("param");
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: param.id,
+      },
+      include: {
+        _count: {
+          select: {
+            followingTopics: true,
+            members: true,
+            events: true,
+          },
+        },
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch user by id",
+      data: {
+        user,
       },
     });
   }
