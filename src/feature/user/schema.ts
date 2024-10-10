@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const editProfileBodySchema = z.object({
-  name: z.string().optional(),
-  bio: z.string().optional(),
+  name: z.string().max(32).optional(),
+  bio: z.string().max(250).optional(),
 });
 
 export const profileIdParamSchema = z.object({
