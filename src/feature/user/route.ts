@@ -109,6 +109,20 @@ app.get(
             slug: true,
           },
         },
+        members: {
+          select: {
+            id: true,
+            role: true,
+            group: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                poster: true,
+              },
+            },
+          },
+        },
       },
     });
 
