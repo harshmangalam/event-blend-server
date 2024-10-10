@@ -1,5 +1,7 @@
 # Eventblend API Server
 
+If you find this project helpful, please consider giving it a ⭐ to help it grow and support open source development!
+
 ## Setup
 
 ### Install dependencies
@@ -30,7 +32,10 @@ Setup your postgresql db
 
 ### Open
 
-http://localhost:3001
+http://localhost:3000
+
+Also setup eventblend frontend locally
+https://github.com/harshmangalam/event-blend-frontend
 
 ## Tech stack
 
