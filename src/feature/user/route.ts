@@ -102,6 +102,13 @@ app.get(
             events: true,
           },
         },
+        followingTopics: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
       },
     });
 
