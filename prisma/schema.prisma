@@ -53,10 +53,10 @@ model Location {
 
 model User {
   id              String         @id @default(cuid())
-  name            String
+  name            String         @db.VarChar(32)
   email           String         @unique
   password        String
-  bio             String?
+  bio             String?        @db.VarChar(250)
   profilePhoto    String?
   gender          GenderEnum?    @default(Male)
   role            RoleEnum       @default(User)
