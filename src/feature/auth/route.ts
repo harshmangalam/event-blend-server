@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getExpTimestamp } from "@/lib/utils";
+import { getExpTimestamp, getGravatarUrl } from "@/lib/utils";
 import { prisma } from "../../lib/prisma";
 import { zValidator } from "@hono/zod-validator";
 import {
@@ -105,6 +105,7 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
     cost: 10,
   });
 
+  const avatarUrl = getGravatarUrl(body.email);
   const user = await prisma.user.create({
     data: {
       email: body.email,
@@ -112,6 +113,7 @@ app.post("/signup", zValidator("json", signupSchema), async (c) => {
       password,
       status: "Offline",
       gender: body.gender as GenderEnum,
+      profilePhoto: avatarUrl,
     },
   });
 
