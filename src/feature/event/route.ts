@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { Variables } from "../../types";
+import { Variables } from "@/types";
 import { zValidator } from "@hono/zod-validator";
-import { geoLocationSchema, paginationSchema } from "../../schema";
+import { geoLocationSchema, paginationSchema } from "@/schema";
 import { jwt } from "hono/jwt";
-import { env } from "../../config/env";
-import { ACCESS_TOKEN_COOKIE_NAME } from "../../config/constants";
-import { isAdmin, isAuthenticated } from "../../middleware/auth";
-import { prisma, Prisma } from "../../lib/prisma";
-import { paginate, reverseGeocodingAPI } from "../../lib/utils";
+import { env } from "@/config/env";
+import { ACCESS_TOKEN_COOKIE_NAME } from "@/config/constants";
+import { isAdmin, isAuthenticated } from "@/middleware/auth";
+import { prisma, Prisma } from "@/lib/prisma";
+import { paginate, reverseGeocodingAPI } from "@/lib/utils";
 import { createEventSchema, eventParamSchema } from "./schema";
 import { HTTPException } from "hono/http-exception";
 
