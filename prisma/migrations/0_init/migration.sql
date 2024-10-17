@@ -10,6 +10,9 @@ CREATE TYPE "GroupMemberRole" AS ENUM ('Member', 'Organizer', 'CoOrganizer', 'Ev
 -- CreateEnum
 CREATE TYPE "EventTypeEnum" AS ENUM ('Online', 'InPerson');
 
+-- CreateEnum
+CREATE TYPE "GenderEnum" AS ENUM ('Male', 'Female', 'Other');
+
 -- CreateTable
 CREATE TABLE "Location" (
     "id" TEXT NOT NULL,
@@ -28,12 +31,12 @@ CREATE TABLE "Location" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" VARCHAR(32) NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "bio" TEXT,
+    "bio" VARCHAR(250),
     "profilePhoto" TEXT,
-    "gender" TEXT NOT NULL,
+    "gender" "GenderEnum" DEFAULT 'Male',
     "role" "RoleEnum" NOT NULL DEFAULT 'User',
     "status" "UserStatusEnum" NOT NULL DEFAULT 'Offline',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -179,6 +182,9 @@ CREATE UNIQUE INDEX "Group_name_key" ON "Group"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Group_slug_key" ON "Group"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "GroupMember_userId_groupId_key" ON "GroupMember"("userId", "groupId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Network_name_key" ON "Network"("name");

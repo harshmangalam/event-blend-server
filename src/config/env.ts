@@ -14,9 +14,6 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   GEOAPIFY_API_KEY: z.string().optional(),
   JWT_SECRET: z.string().trim().min(1),
-  EMAIL_USER: z.string().email().optional(), // Added email validation
-  EMAIL_PASSWORD: z.string().optional(), // Email password validation with a minimum length
-  FRONTEND_URL: z.string().url().optional(), // Validation for the frontend URL
 });
 
 declare module "bun" {

@@ -623,7 +623,7 @@ export const groups = [
 
     members: [
       {
-        email: "user101@eventblend.com",
+        email: "user61@eventblend.com",
         role: "Member" as const,
       },
       {
@@ -635,15 +635,15 @@ export const groups = [
         role: "Member" as const,
       },
       {
-        email: "user102@eventblend.com",
+        email: "user54@eventblend.com",
         role: "Organizer" as const,
       },
       {
-        email: "user102@eventblend.com",
+        email: "user55@eventblend.com",
         role: "EventOrganizer" as const,
       },
       {
-        email: "user102@eventblend.com",
+        email: "user56@eventblend.com",
         role: "AssistantOrganizer" as const,
       },
     ],
@@ -659,7 +659,7 @@ export const groups = [
     },
     admin: {
       connect: {
-        email: "user52@eventblend.com",
+        email: "user57@eventblend.com",
       },
     },
     location: {
@@ -692,7 +692,7 @@ export const groups = [
     },
     admin: {
       connect: {
-        email: "user53@eventblend.com",
+        email: "user58@eventblend.com",
       },
     },
     location: {
@@ -725,7 +725,7 @@ export const groups = [
     },
     admin: {
       connect: {
-        email: "user54@eventblend.com",
+        email: "user59@eventblend.com",
       },
     },
     location: {

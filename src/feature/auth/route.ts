@@ -208,51 +208,51 @@ app.get(
 );
 
 // Password reset request route
-app.post(
-  "/reset-password",
-  zValidator("json", resetPasswordRequestSchema),
-  async (c) => {
-    const body = c.req.valid("json");
+// app.post(
+//   "/reset-password",
+//   zValidator("json", resetPasswordRequestSchema),
+//   async (c) => {
+//     const body = c.req.valid("json");
 
-    const user = await prisma.user.findUnique({
-      where: { email: body.email },
-    });
+//     const user = await prisma.user.findUnique({
+//       where: { email: body.email },
+//     });
 
-    if (!user) {
-      throw new HTTPException(404, {
-        message: "User with this email does not exist",
-      });
-    }
+//     if (!user) {
+//       throw new HTTPException(404, {
+//         message: "User with this email does not exist",
+//       });
+//     }
 
-    const token = await sign(
-      {
-        exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-        sub: user.id,
-      },
-      env.JWT_SECRET
-    );
+//     const token = await sign(
+//       {
+//         exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+//         sub: user.id,
+//       },
+//       env.JWT_SECRET
+//     );
 
-    const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
+//     const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    const mailOptions = {
-      from: env.EMAIL_USER,
-      to: user.email,
-      subject: "Password Reset",
-      html: `
-      <p>You requested a password reset. Click the link below to reset your password:</p>
-      <a href="${resetLink}">Reset Password</a>
-      <p>This link is valid for 1 hour.</p>
-    `,
-    };
+//     const mailOptions = {
+//       from: env.EMAIL_USER,
+//       to: user.email,
+//       subject: "Password Reset",
+//       html: `
+//       <p>You requested a password reset. Click the link below to reset your password:</p>
+//       <a href="${resetLink}">Reset Password</a>
+//       <p>This link is valid for 1 hour.</p>
+//     `,
+//     };
 
-    await transporter.sendMail(mailOptions);
+//     await transporter.sendMail(mailOptions);
 
-    return c.json({
-      success: true,
-      message: "Password reset email sent successfully",
-    });
-  }
-);
+//     return c.json({
+//       success: true,
+//       message: "Password reset email sent successfully",
+//     });
+//   }
+// );
 
 // Confirm password reset route
 app.post("/reset-password/confirm", async (c) => {
