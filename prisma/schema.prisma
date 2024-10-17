@@ -113,6 +113,8 @@ model GroupMember {
   role      GroupMemberRole? @default(Member)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+
+  @@unique([userId, groupId])
 }
 
 model Network {
