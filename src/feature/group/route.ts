@@ -19,6 +19,43 @@ import { HTTPException } from "hono/http-exception";
 const app = new Hono<{ Variables: Variables }>();
 
 app.post(
+  "/:groupId/join-group",
+  zValidator("param", groupParamSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const param = c.req.valid("param");
+    const currentUser = c.get("user");
+
+    console.log("Hii");
+    try {
+      await prisma.groupMember.create({
+        data: {
+          groupId: param.groupId,
+          userId: currentUser.id,
+          role: "Member",
+        },
+      });
+      return c.json(
+        {
+          success: true,
+          message: "Group joined successfully",
+        },
+        201
+      );
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        throw new HTTPException(400, {
+          message: "You are already the member",
+        });
+      }
+    }
+  }
+);
+app.post(
   "/",
   zValidator("json", createGroupSchema),
   jwt({
@@ -411,9 +448,9 @@ app.get(
   }
 );
 
-app.post(
-  "/:groupId/join",
-  zValidator("param", groupParamSchema),
+app.get(
+  "/:slug/is-member",
+  zValidator("param", groupSlugSchema),
   jwt({
     secret: env.JWT_SECRET,
     cookie: ACCESS_TOKEN_COOKIE_NAME,
@@ -424,58 +461,22 @@ app.post(
     const currentUser = c.get("user");
 
     try {
-      await prisma.groupMember.create({
-        data: {
-          groupId: param.groupId,
-          userId: currentUser.id,
-          role: "Member",
-        },
-      });
-      return c.json(
-        {
-          success: true,
-          message: "Group joined successfully",
-        },
-        201
-      );
-    } catch (error: any) {
-      if (error.code === "P2002") {
-        throw new HTTPException(400, {
-          message: "You are already the member",
-        });
-      }
-    }
-  }
-);
-
-app.delete(
-  "/:groupId/leave",
-  zValidator("param", groupParamSchema),
-  jwt({
-    secret: env.JWT_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const param = c.req.valid("param");
-    const currentUser = c.get("user");
-
-    try {
-      await prisma.groupMember.delete({
+      const member = await prisma.groupMember.findFirst({
         where: {
-          userId_groupId: {
-            groupId: param.groupId,
-            userId: currentUser.id,
+          group: {
+            slug: param.slug,
           },
+          userId: currentUser.id,
         },
       });
-      return c.json(
-        {
-          success: true,
-          message: "Group left successfully",
+
+      return c.json({
+        success: true,
+        message: "Fetch membership",
+        data: {
+          isMember: !!member,
         },
-        201
-      );
+      });
     } catch (error: any) {
       if (error.code === "P2025") {
         throw new HTTPException(400, {
@@ -509,6 +510,55 @@ app.patch(
       success: true,
       message: "Updated group!",
     });
+  }
+);
+
+app.patch(
+  "/:groupId/join-leave",
+  zValidator("param", groupParamSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const param = c.req.valid("param");
+    const currentUser = c.get("user");
+    try {
+      await prisma.groupMember.create({
+        data: {
+          groupId: param.groupId,
+          userId: currentUser.id,
+          role: "Member",
+        },
+      });
+
+      return c.json(
+        {
+          success: true,
+          message: "Group joined successfully",
+        },
+        201
+      );
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        await prisma.groupMember.delete({
+          where: {
+            userId_groupId: {
+              groupId: param.groupId,
+              userId: currentUser.id,
+            },
+          },
+        });
+        return c.json(
+          {
+            success: true,
+            message: "Group left successfully",
+          },
+          201
+        );
+      }
+    }
   }
 );
 
