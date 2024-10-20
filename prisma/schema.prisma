@@ -22,8 +22,6 @@ enum GroupMemberRole {
   Member
   Organizer
   CoOrganizer
-  EventOrganizer
-  AssistantOrganizer
 }
 
 enum EventTypeEnum {
