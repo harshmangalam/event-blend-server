@@ -127,6 +127,14 @@ app.post(
       },
     });
 
+    await prisma.groupMember.create({
+      data: {
+        groupId: group.id,
+        userId: currentUser.id,
+        role: "Organizer",
+      },
+    });
+
     return c.json(
       {
         success: true,
@@ -335,6 +343,40 @@ app.get("/discover-groups", async (c) => {
     data: { groups },
   });
 });
+app.get(
+  "/your-groups",
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const currentUser = c.get("user");
+    const groupMembers = await prisma.groupMember.findMany({
+      where: {
+        userId: currentUser.id,
+      },
+      select: {
+        id: true,
+        group: {
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            poster: true,
+          },
+        },
+        role: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch your groups",
+      data: { groupMembers },
+    });
+  }
+);
 
 app.get(
   "/groups-options",
