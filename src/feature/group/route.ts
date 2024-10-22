@@ -91,6 +91,11 @@ app.post(
       location?.[0],
       location?.[1]
     );
+    if (!locationResp) {
+      throw new HTTPException(400, {
+        message: "Error while fetching geoapify location",
+      });
+    }
     const { timezone, lat, lon, ...rest } =
       geoLocationSchema.parse(locationResp);
 
@@ -442,6 +447,12 @@ app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
       },
     },
   });
+
+  if (!group) {
+    throw new HTTPException(404, {
+      message: "Group not found",
+    });
+  }
 
   return c.json({
     success: true,
