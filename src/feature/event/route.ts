@@ -134,6 +134,13 @@ app.post(
         },
         categoryId: body.categoryId,
       },
+      include: {
+        group: {
+          select: {
+            slug: true,
+          },
+        },
+      },
     });
 
     return c.json({
