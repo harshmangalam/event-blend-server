@@ -46,6 +46,21 @@ https://github.com/harshmangalam/event-blend-frontend
 - Zod
 - Postgresql
 
+## Seeding
+
+If you want to add dummy data you can use seeding
+
+- Admin
+  - GET http://localhost:3000/api/seed/users?role=Admin&num=5
+- Users
+  - GET http://localhost:3000/api/seed/users?role=User&num=50
+- Categories
+  - http://localhost:3000/api/seed/categories
+- Locations
+  - http://localhost:3000/api/seed/locations
+- Groups
+  - http://localhost:3000/api/seed/groups
+
 ## Folder structure
 
 - `/prisma/`
