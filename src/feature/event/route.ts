@@ -328,4 +328,59 @@ app.patch(
     }
   }
 );
+app.patch(
+  "/:id/has-rsvp",
+  zValidator("param", eventParamSchema),
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const param = c.req.valid("param");
+    const currentUser = c.get("user");
+    try {
+      const eventMember = await prisma.eventMember.findUnique({
+        where: {
+          userId_eventId: {
+            eventId: param.id,
+            userId: currentUser.id,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      return c.json(
+        {
+          success: true,
+          message: "RSVP successful",
+          data: {
+            hasRSVP: eventMember?.id,
+          },
+        },
+        201
+      );
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        await prisma.eventMember.delete({
+          where: {
+            userId_eventId: {
+              eventId: param.id,
+              userId: currentUser.id,
+            },
+          },
+        });
+        return c.json(
+          {
+            success: true,
+            message: "RSVP canceled",
+          },
+          201
+        );
+      }
+    }
+  }
+);
 export default app;
