@@ -328,7 +328,7 @@ app.patch(
     }
   }
 );
-app.patch(
+app.get(
   "/:id/has-rsvp",
   zValidator("param", eventParamSchema),
   jwt({
