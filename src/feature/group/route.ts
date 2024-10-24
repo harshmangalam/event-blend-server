@@ -19,43 +19,6 @@ import { HTTPException } from "hono/http-exception";
 const app = new Hono<{ Variables: Variables }>();
 
 app.post(
-  "/:groupId/join-group",
-  zValidator("param", groupParamSchema),
-  jwt({
-    secret: env.JWT_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const param = c.req.valid("param");
-    const currentUser = c.get("user");
-
-    console.log("Hii");
-    try {
-      await prisma.groupMember.create({
-        data: {
-          groupId: param.groupId,
-          userId: currentUser.id,
-          role: "Member",
-        },
-      });
-      return c.json(
-        {
-          success: true,
-          message: "Group joined successfully",
-        },
-        201
-      );
-    } catch (error: any) {
-      if (error.code === "P2002") {
-        throw new HTTPException(400, {
-          message: "You are already the member",
-        });
-      }
-    }
-  }
-);
-app.post(
   "/",
   zValidator("json", createGroupSchema),
   jwt({
