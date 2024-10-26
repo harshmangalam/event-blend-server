@@ -90,7 +90,7 @@ Join Discord Server: https://discord.gg/YNk8MRzb
 
 ## Docker Support
 
-This project now includes Docker support for easy setup and deployment, using Bun instead of Node.js.
+This project includes Docker support for easy setup and deployment, using Bun runtime.
 
 ### Prerequisites
 
@@ -105,12 +105,22 @@ This project now includes Docker support for easy setup and deployment, using Bu
    cd eventblend-api
    ```
 
-2. Build and run the Docker containers:
+2. Create a `.env` file from the `.env.example`:
+   ```
+   cp .env.example .env
+   ```
+
+3. In the `.env` file, ensure the `DATABASE_URL_DOCKER` is set to:
+   ```
+   DATABASE_URL_DOCKER="postgresql://postgres:postgres@db:5432/eventblend"
+   ```
+
+4. Build and run the Docker containers:
    ```
    docker-compose up --build
    ```
 
-3. The application will be available at `http://localhost:3000`
+5. The application will be available at `http://localhost:3000`
 
 ### Stopping the Docker containers
 
@@ -149,3 +159,31 @@ For real-time logs:
 ```
 docker-compose logs -f event-blend-server
 ```
+
+### Docker Compose Services
+
+The `docker-compose.yml` file defines two services:
+
+1. `event-blend-server`: The main application server
+   - Built from the Dockerfile in the current directory
+   - Exposes port 3000
+   - Depends on the `db` service
+   - Restarts unless stopped manually
+
+2. `db`: PostgreSQL database
+   - Uses PostgreSQL 13
+   - Environment variables set for database name, user, and password
+   - Data persisted in a named volume
+   - Restarts unless stopped manually
+
+### Dockerfile
+
+The Dockerfile uses the Bun runtime and follows these steps:
+1. Sets up the working directory
+2. Copies package files and installs dependencies
+3. Copies the rest of the application code
+4. Builds the application
+5. Exposes port 3000
+6. Sets the command to start the server
+
+Make sure all your application code is compatible with the Bun runtime for optimal performance.
