@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  event-blend-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: event-blend-server
+    container_name: event-blend-server
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/eventblend
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    container_name: event-blend-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=eventblend
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
