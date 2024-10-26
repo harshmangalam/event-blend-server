@@ -86,8 +86,6 @@ https://github.com/harshmangalam/event-blend-frontend
 
 **Please go through CONTRIBUTING.md file before start contribution and code changes**.
 
-Join Discord Server: https://discord.gg/YNk8MRzb
-
 ## Docker Support
 
 This project includes Docker support for easy setup and deployment, using Bun runtime.
@@ -187,3 +185,6 @@ The Dockerfile uses the Bun runtime and follows these steps:
 6. Sets the command to start the server
 
 Make sure all your application code is compatible with the Bun runtime for optimal performance.
+
+Join Discord Server: https://discord.gg/tDGxWUvTEP
+

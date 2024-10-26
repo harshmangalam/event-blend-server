@@ -640,11 +640,11 @@ export const groups = [
       },
       {
         email: "user55@eventblend.com",
-        role: "EventOrganizer" as const,
+        role: "Organizer" as const,
       },
       {
         email: "user56@eventblend.com",
-        role: "AssistantOrganizer" as const,
+        role: "Organizer" as const,
       },
     ],
   },

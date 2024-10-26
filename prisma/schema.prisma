@@ -22,8 +22,6 @@ enum GroupMemberRole {
   Member
   Organizer
   CoOrganizer
-  EventOrganizer
-  AssistantOrganizer
 }
 
 enum EventTypeEnum {
@@ -62,7 +60,7 @@ model User {
   role            RoleEnum       @default(User)
   members         GroupMember[]
   groupsAdmin     Group[]
-  events          Event[]
+  events          EventMember[]
   followingTopics Topic[]
   network         Network?
   status          UserStatusEnum @default(Offline)
@@ -151,7 +149,7 @@ model Event {
   locationId String
   details    String?
   dates      EventDate[]
-  attendees  User[]
+  attendees  EventMember[]
   address    String
   eventType  EventTypeEnum @default(InPerson)
   category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -170,4 +168,16 @@ model EventDate {
   event     Event    @relation(fields: [eventId], references: [id])
 
   @@index([eventId])
+}
+
+model EventMember {
+  id        String   @id @default(cuid())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventId])
 }

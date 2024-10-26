@@ -19,43 +19,6 @@ import { HTTPException } from "hono/http-exception";
 const app = new Hono<{ Variables: Variables }>();
 
 app.post(
-  "/:groupId/join-group",
-  zValidator("param", groupParamSchema),
-  jwt({
-    secret: env.JWT_SECRET,
-    cookie: ACCESS_TOKEN_COOKIE_NAME,
-  }),
-  isAuthenticated,
-  async (c) => {
-    const param = c.req.valid("param");
-    const currentUser = c.get("user");
-
-    console.log("Hii");
-    try {
-      await prisma.groupMember.create({
-        data: {
-          groupId: param.groupId,
-          userId: currentUser.id,
-          role: "Member",
-        },
-      });
-      return c.json(
-        {
-          success: true,
-          message: "Group joined successfully",
-        },
-        201
-      );
-    } catch (error: any) {
-      if (error.code === "P2002") {
-        throw new HTTPException(400, {
-          message: "You are already the member",
-        });
-      }
-    }
-  }
-);
-app.post(
   "/",
   zValidator("json", createGroupSchema),
   jwt({
@@ -91,6 +54,11 @@ app.post(
       location?.[0],
       location?.[1]
     );
+    if (!locationResp) {
+      throw new HTTPException(400, {
+        message: "Error while fetching geoapify location",
+      });
+    }
     const { timezone, lat, lon, ...rest } =
       geoLocationSchema.parse(locationResp);
 
@@ -124,6 +92,14 @@ app.post(
         slug,
         adminId: currentUser.id,
         networkId: network?.id,
+      },
+    });
+
+    await prisma.groupMember.create({
+      data: {
+        groupId: group.id,
+        userId: currentUser.id,
+        role: "Organizer",
       },
     });
 
@@ -335,6 +311,40 @@ app.get("/discover-groups", async (c) => {
     data: { groups },
   });
 });
+app.get(
+  "/your-groups",
+  jwt({
+    secret: env.JWT_SECRET,
+    cookie: ACCESS_TOKEN_COOKIE_NAME,
+  }),
+  isAuthenticated,
+  async (c) => {
+    const currentUser = c.get("user");
+    const groupMembers = await prisma.groupMember.findMany({
+      where: {
+        userId: currentUser.id,
+      },
+      select: {
+        id: true,
+        group: {
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            poster: true,
+          },
+        },
+        role: true,
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: "Fetch your groups",
+      data: { groupMembers },
+    });
+  }
+);
 
 app.get(
   "/groups-options",
@@ -400,6 +410,12 @@ app.get("/:slug", zValidator("param", groupSlugSchema), async (c) => {
       },
     },
   });
+
+  if (!group) {
+    throw new HTTPException(404, {
+      message: "Group not found",
+    });
+  }
 
   return c.json({
     success: true,

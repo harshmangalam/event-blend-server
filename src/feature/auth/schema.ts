@@ -5,7 +5,7 @@ const signupSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6),
-  gender: z.enum(["Male", "Femal", "Other"]),
+  gender: z.enum(["Male", "Female", "Other"]),
 });
 
 const loginSchema = z.object({
