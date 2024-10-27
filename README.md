@@ -92,10 +92,43 @@ This project includes Docker support for easy setup and deployment, using Bun ru
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
+- Bun
+- Docker and Docker Compose (for Docker setup)
+- PostgreSQL (for local setup without Docker)
 
-### Running with Docker
+### Local Setup
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/harshmangalam/eventblend-api.git
+   cd eventblend-api
+   ```
+
+2. Install dependencies:
+   ```
+   bun install
+   ```
+
+3. Create a `.env` file from the `.env.example`:
+   ```
+   cp .env.example .env
+   ```
+
+4. Update the `.env` file with your local PostgreSQL credentials.
+
+5. Run Prisma migrations:
+   ```
+   bunx prisma migrate deploy
+   ```
+
+6. Start the server:
+   ```
+   bun run dev
+   ```
+
+7. Open http://localhost:3000 in your browser.
+
+### Docker Setup
 
 1. Clone the repository:
    ```
@@ -108,45 +141,59 @@ This project includes Docker support for easy setup and deployment, using Bun ru
    cp .env.example .env
    ```
 
-3. In the `.env` file, ensure the `DATABASE_URL_DOCKER` is set to:
-   ```
-   DATABASE_URL_DOCKER="postgresql://postgres:postgres@db:5432/eventblend"
-   ```
-
-4. Build and run the Docker containers:
+3. Build and run the Docker containers:
    ```
    docker-compose up --build
    ```
 
+4. In a new terminal, run Prisma migrations:
+   ```
+   docker-compose exec event-blend-server bunx prisma migrate deploy
+   ```
+
 5. The application will be available at `http://localhost:3000`
 
-### Stopping the Docker containers
+## Tech Stack
 
-To stop the running containers, use:
+- TypeScript
+- Bun
+- Hono
+- Prisma
+- Zod
+- PostgreSQL
+
+## Folder Structure
+
+- `/prisma/`: Contains Prisma schema, seeds, and migrations.
+- `/src/config/`: Configuration files.
+- `/src/lib/`: Library initialization and utility functions.
+- `/src/middleware/`: Auth and other middlewares.
+- `/src/schema/`: Global Zod schemas.
+- `/src/types/`: Global types.
+- `/src/feature/`: Platform features (auth, category, event, etc.).
+
+## Docker Support
+
+### Stopping the Docker Containers
+
+To stop the running containers:
 ```
 docker-compose down
 ```
 
-To stop the containers and remove the volumes (this will delete the database data), use:
+To stop the containers and remove the volumes:
 ```
 docker-compose down -v
 ```
 
-### Running Prisma migrations
+### Accessing the Database
 
-After starting the containers, you may need to run Prisma migrations. You can do this with:
-```
-docker-compose exec event-blend-server bun run prisma migrate deploy
-```
-
-### Accessing the database
-
-To access the PostgreSQL database directly, you can use:
+To access the PostgreSQL database directly:
 ```
 docker-compose exec db psql -U postgres -d eventblend
 ```
 
-### Viewing logs
+### Viewing Logs
 
 To view the logs of the event-blend-server:
 ```
@@ -158,24 +205,17 @@ For real-time logs:
 docker-compose logs -f event-blend-server
 ```
 
-### Docker Compose Services
+## Contributing
 
-The `docker-compose.yml` file defines two services:
+Please read the CONTRIBUTING.md file before making any contributions.
 
-1. `event-blend-server`: The main application server
-   - Built from the Dockerfile in the current directory
-   - Exposes port 3000
-   - Depends on the `db` service
-   - Restarts unless stopped manually
+## Community
 
-2. `db`: PostgreSQL database
-   - Uses PostgreSQL 13
-   - Environment variables set for database name, user, and password
-   - Data persisted in a named volume
-   - Restarts unless stopped manually
+Join our Discord Server: https://discord.gg/YNk8MRzb
 
-### Dockerfile
+## Frontend Repository
 
+<<<<<<< HEAD
 The Dockerfile uses the Bun runtime and follows these steps:
 1. Sets up the working directory
 2. Copies package files and installs dependencies
@@ -188,3 +228,7 @@ Make sure all your application code is compatible with the Bun runtime for optim
 
 Join Discord Server: https://discord.gg/tDGxWUvTEP
 
+=======
+Set up the Eventblend frontend locally:
+https://github.com/harshmangalam/event-blend-frontend
+>>>>>>> 28f1363 (feat(docker): add Docker support with Bun runtime)

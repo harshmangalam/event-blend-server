@@ -2,7 +2,8 @@
   "name": "event-blend-server",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "lint": "bunx eslint . --fix"
+    "lint": "bunx eslint . --fix",
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.2.2",

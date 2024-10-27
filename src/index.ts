@@ -4,6 +4,7 @@ import { extractDuplicatePrismaField } from "./lib/utils";
 import { env } from "./config/env";
 import { Variables } from "./types";
 import { cors } from "hono/cors";
+import { PrismaClient } from "@prisma/client";
 
 import auth from "./feature/auth/route";
 import topics from "./feature/topic/route";
@@ -17,6 +18,8 @@ import seed from "./feature/seed/route";
 import interest from "./feature/interest/route";
 
 const app = new Hono<{ Variables: Variables }>();
+
+const prisma = new PrismaClient();
 
 app.use(
   cors({
@@ -34,6 +37,20 @@ app.route("/api/categories", categories);
 app.route("/api/users", users);
 app.route("/api/seed", seed);
 app.route("/api/interest", interest);
+
+app.get("/", (c) => {
+  return c.text("Hello from Eventblend API!");
+});
+
+app.get("/api/health", async (c) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return c.json({ status: "ok", database: "connected" });
+  } catch (error) {
+    console.error("Database connection error:", error);
+    return c.json({ status: "error", database: "disconnected" }, 500);
+  }
+});
 
 app.onError((err, c) => {
   console.log(err);
@@ -74,8 +91,12 @@ app.onError((err, c) => {
   return c.json({ success: false, message: "Internal server error" }, 500);
 });
 
+const port = Number(process.env.PORT || '3000');
+const host = process.env.HOST || '0.0.0.0';
+
+console.log(`Server is running on http://${host}:${port}`);
+
 export default {
+  port,
   fetch: app.fetch,
-  port: env.PORT,
-  hostname: env.HOST,
 };

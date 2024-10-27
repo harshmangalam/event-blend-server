@@ -10,7 +10,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=${DATABASE_URL_DOCKER}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/eventblend
+      - PORT=3000
+      - HOST=0.0.0.0
     depends_on:
       - db
     restart: unless-stopped
@@ -24,6 +26,8 @@ services:
       - POSTGRES_DB=eventblend
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     restart: unless-stopped
 
 volumes:

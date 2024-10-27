@@ -11,8 +11,8 @@ RUN bun install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN bun run build
+# Generate Prisma client
+RUN bunx prisma generate
 
 # Expose the port the app runs on
 EXPOSE 3000
