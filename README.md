@@ -214,21 +214,5 @@ Please read the CONTRIBUTING.md file before making any contributions.
 Join our Discord Server: https://discord.gg/YNk8MRzb
 
 ## Frontend Repository
-
-<<<<<<< HEAD
-The Dockerfile uses the Bun runtime and follows these steps:
-1. Sets up the working directory
-2. Copies package files and installs dependencies
-3. Copies the rest of the application code
-4. Builds the application
-5. Exposes port 3000
-6. Sets the command to start the server
-
-Make sure all your application code is compatible with the Bun runtime for optimal performance.
-
-Join Discord Server: https://discord.gg/tDGxWUvTEP
-
-=======
 Set up the Eventblend frontend locally:
 https://github.com/harshmangalam/event-blend-frontend
->>>>>>> 28f1363 (feat(docker): add Docker support with Bun runtime)
