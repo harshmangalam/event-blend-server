@@ -5,6 +5,9 @@ import { env } from "./config/env";
 import { Variables } from "./types";
 import { cors } from "hono/cors";
 
+import { timeout } from "hono/timeout";
+import { REQUEST_TIMEOUT_MS } from "@/config/constants";
+import { customTimeoutException } from "@/middleware/timeout";
 import auth from "./feature/auth/route";
 import topics from "./feature/topic/route";
 import networks from "./feature/network/route";
@@ -13,7 +16,6 @@ import locations from "./feature/location/route";
 import events from "./feature/event/route";
 import categories from "./feature/category/route";
 import users from "./feature/user/route";
-import seed from "./feature/seed/route";
 import interest from "./feature/interest/route";
 
 const app = new Hono<{ Variables: Variables }>();
@@ -24,6 +26,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(timeout(REQUEST_TIMEOUT_MS, customTimeoutException));
 app.route("/api/auth", auth);
 app.route("/api/topics", topics);
 app.route("/api/networks", networks);
@@ -32,7 +35,6 @@ app.route("/api/locations", locations);
 app.route("/api/events", events);
 app.route("/api/categories", categories);
 app.route("/api/users", users);
-app.route("/api/seed", seed);
 app.route("/api/interest", interest);
 
 app.onError((err, c) => {
