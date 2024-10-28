@@ -91,8 +91,8 @@ app.onError((err, c) => {
   return c.json({ success: false, message: "Internal server error" }, 500);
 });
 
-const port = Number(process.env.PORT || '3000');
-const host = process.env.HOST || '0.0.0.0';
+const port = Number(env.PORT || '3000');
+const host = env.HOST || '0.0.0.0';
 
 console.log(`Server is running on http://${host}:${port}`);
 
