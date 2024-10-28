@@ -4,41 +4,53 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function createUsers(role: "User" | "Admin", total: number = 10) {
-  const password = await Bun.password.hash("123456", {
-    algorithm: "bcrypt",
-    cost: 8,
-  });
+  try {
+    const password = await Bun.password.hash("123456", {
+      algorithm: "bcrypt",
+      cost: 8,
+    });
 
-  const length = total;
+    const length = total;
 
-  const users = Array.from({ length }, (_, i) => {
-    const email =
-      role === "Admin"
-        ? `admin${length + i + 1}@eventblend.com`
-        : `user${length + i + 1}@eventblend.com`;
+    const users = Array.from({ length }, (_, i) => {
+      const email =
+        role === "Admin"
+          ? `admin${length + i + 1}@eventblend.com`
+          : `user${length + i + 1}@eventblend.com`;
 
-    return {
-      name:
-        role === "Admin" ? `Admin${length + i + 1}` : `User${length + i + 1}`,
-      email: email,
-      password,
-      bio: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, laudantium neque quidem enim eligendi placeat a accusamus corrupti voluptatum suscipit doloribus est, dicta, natus recusandae! Fugit dolorum animi laborum fuga. ${
-        i + 1
-      }`,
-      profilePhoto: getGravatarUrl(email),
-      role,
-    };
-  });
+      return {
+        name:
+          role === "Admin" ? `Admin${length + i + 1}` : `User${length + i + 1}`,
+        email: email,
+        password,
+        bio: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, laudantium neque quidem enim eligendi placeat a accusamus corrupti voluptatum suscipit doloribus est, dicta, natus recusandae! Fugit dolorum animi laborum fuga. ${
+          i + 1
+        }`,
+        profilePhoto: getGravatarUrl(email),
+        role,
+      };
+    });
 
-  await prisma.user.createMany({
-    data: users,
-  });
+    await prisma.user.createMany({
+      data: users,
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 async function createCategories() {
-  for await (const c of categories) {
-    await prisma.category.create({
-      data: c,
-    });
+  try {
+    for await (const c of categories) {
+      await prisma.category.create({
+        data: c,
+      });
+    }
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
 async function createGroups() {
@@ -75,8 +87,10 @@ async function createLocations() {
   });
 }
 
-await createLocations();
-await createCategories();
-await createGroups();
-await createUsers("User", 50);
+const usersData = await createUsers("User", 50);
 await createUsers("Admin", 5);
+await createLocations();
+const catoriesData = await createCategories();
+if (catoriesData && usersData) {
+  await createGroups();
+}

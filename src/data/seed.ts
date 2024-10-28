@@ -1,5 +1,3 @@
-import { Group } from "@prisma/client";
-
 export const categories = [
   {
     name: "Tech",
