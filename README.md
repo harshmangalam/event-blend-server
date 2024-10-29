@@ -1,7 +1,5 @@
 # Eventblend API Server
 
-If you find this project helpful, please consider giving it a ⭐ to help it grow and support open source development!
-
 ## Setup
 
 ### Install dependencies
@@ -19,7 +17,7 @@ cp .env.example .env
 ### Prisma migrations
 
 ```
-bunx prisma migrate deploy
+bun prisma:migrate
 ```
 
 ### Start server
@@ -28,7 +26,33 @@ bunx prisma migrate deploy
 bun run dev
 ```
 
-Setup your postgresql db
+**Setup your postgresql db**
+
+### Prisma
+
+#### Seeding
+
+```
+bun prisma:seed
+```
+
+#### Open studio
+
+```
+bun prisma:studio
+```
+
+#### Reset db
+
+```
+bun prisma:reset
+```
+
+#### Migrations
+
+```
+bun prisma:migrate
+```
 
 ### Open
 

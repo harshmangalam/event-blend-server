@@ -3,7 +3,11 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "lint": "bunx eslint . --fix",
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "prisma:seed": "bun run prisma/seed.ts",
+    "prisma:migrate": "bunx prisma migrate dev --skip-seed",
+    "prisma:studio": "bunx prisma studio",
+    "prisma:reset": "bunx prisma migrate reset"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.2.2",

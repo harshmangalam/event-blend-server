@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "target": "ESNext",
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,4 +15,7 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
+    },
+    "moduleResolution": "Bundler"
+  }
 }
