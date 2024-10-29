@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "lint": "bunx eslint . --fix",
+    "start": "bun run src/index.ts",
     "prisma:seed": "bun run prisma/seed.ts",
     "prisma:migrate": "bunx prisma migrate dev --skip-seed",
     "prisma:studio": "bunx prisma studio",
